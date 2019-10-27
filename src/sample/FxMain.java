@@ -21,6 +21,7 @@ public class FxMain extends Application {
     public static int tileSize = 50;
     private GridPane gridPane = new GridPane();
     public int selectedX = -1, selectedY = -1;
+    public boolean currentPlayer = false;
     private GameBoard gameBoard = new GameBoard();
 
     private void setAllTiles(){
@@ -48,7 +49,6 @@ public class FxMain extends Application {
                 gridPane.add(circle, j, i);
             }
         }
-
     }
 
     private void addGridEvent() {
@@ -58,15 +58,22 @@ public class FxMain extends Application {
                 public void handle(MouseEvent event) {
                     System.out.println(GridPane.getColumnIndex(item) + " " + GridPane.getRowIndex(item));
                     int getPiece = gameBoard.getTile(GridPane.getColumnIndex(item), GridPane.getRowIndex(item));
+                    int toX = GridPane.getColumnIndex(item);
+                    int toY = GridPane.getRowIndex(item);
+
                     if(getPiece == 1 || getPiece == 2){
-                        selectedX = GridPane.getColumnIndex(item);
-                        selectedY = GridPane.getRowIndex(item);
+                        if(currentPlayer && getPiece == 1){
+                            gameBoard.movePiece(selectedX, selectedY, toX, toY);
+                            reset();
+                        } else if(!currentPlayer && getPiece == 2){
+                            gameBoard.movePiece(selectedX, selectedY, toX, toY);
+                            reset();
+                        } else {
+                            selectedX = GridPane.getColumnIndex(item);
+                            selectedY = GridPane.getRowIndex(item);
+                        }
                     } else if (selectedX != -1 && selectedY != -1){
-                        int toX = GridPane.getColumnIndex(item);
-                        int toY = GridPane.getRowIndex(item);
                         gameBoard.movePiece(selectedX, selectedY, toX, toY);
-                        reset();
-                    } else {
                         reset();
                     }
                 }
@@ -77,6 +84,7 @@ public class FxMain extends Application {
     private void reset(){
         selectedX = -1;
         selectedY = -1;
+        currentPlayer = !currentPlayer;
         setAllTiles();
         addGridEvent();
     }

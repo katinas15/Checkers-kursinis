@@ -25,8 +25,17 @@ public class GameBoard {
         if(!checkPiece(piece)) return;
 
         if(checkSingleStep(piece%2==0, pieceX, pieceY, toX, toY)){
-            board[pieceY][pieceX] = 0;
-            board[toY][toX] = piece;
+            if(board[toY][toX] == 1 || board[toY][toX] == 2){
+                if(checkHit(piece%2==0, toX, toY)){
+                    board[toY + (toY - pieceY)][toX + (toX - pieceX)] = piece;
+                    board[pieceY][pieceX] = 0;
+                    board[toY][toX] = 0;
+                }
+            } else {
+                board[pieceY][pieceX] = 0;
+                board[toY][toX] = piece;
+            }
+
         }
     }
 
@@ -36,6 +45,15 @@ public class GameBoard {
             return false;
         }
         return true;
+    }
+
+    private boolean checkHit(boolean color, int toX, int toY){
+        if(color){
+            if(board[toY][toX] == 1) return true;
+        } else {
+            if(board[toY][toX] == 2) return true;
+        }
+        return false;
     }
 
     private boolean checkSingleStep(boolean color, int pieceX, int pieceY, int toX, int toY){
