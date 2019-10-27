@@ -20,9 +20,9 @@ public class GameBoard {
         return board[y][x];
     }
 
-    public void movePiece(int pieceX, int pieceY, int toX, int toY){
+    public boolean movePiece(int pieceX, int pieceY, int toX, int toY){
         int piece = board[pieceY][pieceX];
-        if(!checkPiece(piece)) return;
+        if(!checkPiece(piece)) return false;
 
         if(checkSingleStep(piece%2==0, pieceX, pieceY, toX, toY)){
             if(board[toY][toX] == 1 || board[toY][toX] == 2){
@@ -30,13 +30,15 @@ public class GameBoard {
                     board[toY + (toY - pieceY)][toX + (toX - pieceX)] = piece;
                     board[pieceY][pieceX] = 0;
                     board[toY][toX] = 0;
+                    return true;
                 }
             } else {
                 board[pieceY][pieceX] = 0;
                 board[toY][toX] = piece;
             }
-
         }
+
+        return false;
     }
 
     private boolean checkPiece(int piece){

@@ -63,28 +63,37 @@ public class FxMain extends Application {
 
                     if(getPiece == 1 || getPiece == 2){
                         if(currentPlayer && getPiece == 1){
-                            gameBoard.movePiece(selectedX, selectedY, toX, toY);
+                            if(!gameBoard.movePiece(selectedX, selectedY, toX, toY)) changePlayer();
                             reset();
                         } else if(!currentPlayer && getPiece == 2){
-                            gameBoard.movePiece(selectedX, selectedY, toX, toY);
+                            if(!gameBoard.movePiece(selectedX, selectedY, toX, toY)) changePlayer();
                             reset();
                         } else {
                             selectedX = GridPane.getColumnIndex(item);
                             selectedY = GridPane.getRowIndex(item);
                         }
+
                     } else if (selectedX != -1 && selectedY != -1){
                         gameBoard.movePiece(selectedX, selectedY, toX, toY);
+                        changePlayer();
+                        reset();
+                    } else {
                         reset();
                     }
+
+
                 }
             });
         });
     }
 
+    private void changePlayer(){
+        currentPlayer = !currentPlayer;
+    }
+
     private void reset(){
         selectedX = -1;
         selectedY = -1;
-        currentPlayer = !currentPlayer;
         setAllTiles();
         addGridEvent();
     }
