@@ -20,7 +20,7 @@ public class FxMain extends Application {
 
     public static int tileSize = 50;
     private GridPane gridPane = new GridPane();
-    public int selectedX = 0, selectedY = 0;
+    public int selectedX = -1, selectedY = -1;
     private GameBoard gameBoard = new GameBoard();
 
     private void setAllTiles(){
@@ -32,7 +32,7 @@ public class FxMain extends Application {
                 } else {
                     rect.setFill(Color.web("#32a881"));
                 }
-                gridPane.add(rect, i, j);
+                gridPane.add(rect, j, i);
 
                 Circle circle = new Circle();
                 circle.setRadius(tileSize/2 - 1.5f);
@@ -45,7 +45,7 @@ public class FxMain extends Application {
 
                 circle.setStrokeWidth(3);
                 circle.setStroke(Color.BLACK);
-                gridPane.add(circle, i, j);
+                gridPane.add(circle, j, i);
             }
         }
 
@@ -56,12 +56,29 @@ public class FxMain extends Application {
             item.setOnMouseClicked(new EventHandler<MouseEvent>() {
                 @Override
                 public void handle(MouseEvent event) {
-                    selectedX = GridPane.getColumnIndex(item);
-                    selectedY = GridPane.getRowIndex(item);
-                    System.out.println(selectedX + " " + selectedY);
+                    System.out.println(GridPane.getColumnIndex(item) + " " + GridPane.getRowIndex(item));
+                    int getPiece = gameBoard.getTile(GridPane.getColumnIndex(item), GridPane.getRowIndex(item));
+                    if(getPiece == 1 || getPiece == 2){
+                        selectedX = GridPane.getColumnIndex(item);
+                        selectedY = GridPane.getRowIndex(item);
+                    } else if (selectedX != -1 && selectedY != -1){
+                        int toX = GridPane.getColumnIndex(item);
+                        int toY = GridPane.getRowIndex(item);
+                        gameBoard.movePiece(selectedX, selectedY, toX, toY);
+                        reset();
+                    } else {
+                        reset();
+                    }
                 }
             });
         });
+    }
+
+    private void reset(){
+        selectedX = -1;
+        selectedY = -1;
+        setAllTiles();
+        addGridEvent();
     }
 
     @Override

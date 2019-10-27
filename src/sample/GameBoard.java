@@ -17,7 +17,7 @@ public class GameBoard {
     };
 
     public int getTile(int x,int y){
-        return board[x][y];
+        return board[y][x];
     }
 
     public void movePiece(int pieceX, int pieceY, int toX, int toY){
