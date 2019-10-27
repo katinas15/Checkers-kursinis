@@ -25,7 +25,7 @@ public class GameBoard {
         if(!checkPiece(piece)) return;
 
         if(checkSingleStep(piece%2==0, pieceX, pieceY, toX, toY)){
-            board[pieceY][pieceX] = board[pieceY][pieceX];
+            board[pieceY][pieceX] = 0;
             board[toY][toX] = piece;
         }
     }
@@ -49,7 +49,6 @@ public class GameBoard {
 
         System.out.println("incorrect destination");
         return false;
-
     }
 
 }
