@@ -5,6 +5,7 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
@@ -13,6 +14,7 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
 import javafx.stage.Stage;
+import javafx.scene.text.Text;
 
 import static sample.GameBoard.*;
 
@@ -23,6 +25,7 @@ public class FxMain extends Application {
     public int selectedX = -1, selectedY = -1;
     public boolean currentPlayer = false;
     private GameBoard gameBoard = new GameBoard();
+    private Text text = new Text();
 
     private void setAllTiles(){
         for(int i = 0; i<tableHeight; i++) {
@@ -49,6 +52,14 @@ public class FxMain extends Application {
                 gridPane.add(circle, j, i);
             }
         }
+
+
+        if(currentPlayer){
+            text.setText("Player Red");
+        } else text.setText("Player White");
+
+        text.setX(tileSize*tableWidth);
+        text.setY(20);
     }
 
     private void addGridEvent() {
@@ -102,9 +113,8 @@ public class FxMain extends Application {
     public void start(Stage primaryStage) throws Exception{
         gridPane.setMinSize(tileSize*tableWidth, tileSize*tableHeight);
 
-
         primaryStage.setTitle("Checkers");
-        primaryStage.setScene(new Scene(gridPane, tileSize*tableWidth,  tileSize*tableHeight));
+        primaryStage.setScene(new Scene(gridPane, tileSize*tableWidth + 100,  tileSize*tableHeight));
         primaryStage.show();
 
         setAllTiles();

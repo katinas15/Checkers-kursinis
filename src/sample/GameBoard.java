@@ -26,7 +26,7 @@ public class GameBoard {
 
         if(checkSingleStep(piece%2==0, pieceX, pieceY, toX, toY)){
             if(board[toY][toX] == 1 || board[toY][toX] == 2){
-                if(checkHit(piece%2==0, toX, toY)){
+                if(checkHit(piece%2==0,pieceX, pieceY, toX, toY)){
                     board[toY + (toY - pieceY)][toX + (toX - pieceX)] = piece;
                     board[pieceY][pieceX] = 0;
                     board[toY][toX] = 0;
@@ -49,11 +49,11 @@ public class GameBoard {
         return true;
     }
 
-    private boolean checkHit(boolean color, int toX, int toY){
+    private boolean checkHit(boolean color,int pieceX, int pieceY, int toX, int toY){
         if(color){
-            if(board[toY][toX] == 1) return true;
+            if(board[toY][toX] == 1 && board[toY + (toY - pieceY)][toX + (toX - pieceX)] == 0) return true;
         } else {
-            if(board[toY][toX] == 2) return true;
+            if(board[toY][toX] == 2 && board[toY + (toY - pieceY)][toX + (toX - pieceX)] == 0) return true;
         }
         return false;
     }
