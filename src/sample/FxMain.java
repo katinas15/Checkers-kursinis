@@ -25,23 +25,21 @@ public class FxMain extends Application {
 
     public static int tileSize = 50;
     private GridPane gridPane = new GridPane();
-    public int selectedX = -1, selectedY = -1;
-    public boolean currentPlayer = false;
+    public static Piece selectedPiece;
+    public static boolean currentPlayer = true;
     private GameBoard gameBoard = new GameBoard();
     private Text text = new Text();
+    public static String[] playerPieceColor = {"#ede6e4", "#fc3903"};
+    public static String[] tileColor = {"#a88132", "#32a881"};
+    public static String selectedTile = "#3882c2";
 
-    ArrayList<Piece> allPieces = new ArrayList();
-    ArrayList<Tile> allTiles = new ArrayList();
-
-    private String[] tileColor = {"#a88132", "#32a881"};
-    private String[] playerPiece = {"#ede6e4", "#fc3903"};
-    private String selectedTile = "#3882c2";
+    private ArrayList<Piece> allPieces = new ArrayList();
+    private ArrayList<Tile> allTiles = new ArrayList();
 
     private void setTiles(){
         boolean color = false;
 
         for(int i = 0; i<tableHeight; i++) {
-            color = !color;
             for (int j = 0; j < tableWidth; j++) {
                 Rectangle rect = new Rectangle(0, 0, tileSize, tileSize);
                 int val = color? 1 : 0;
@@ -51,61 +49,49 @@ public class FxMain extends Application {
                 allTiles.add(tile);
                 color = !color;
             }
+            color = !color;
         }
     }
 
     private void setCurrentPlayerText(){
         if(currentPlayer){
-            text.setText("Player Red");
-        } else text.setText("Player White");
+            text.setText("Player White");
+        } else text.setText("Player Red");
 
         text.setX(tileSize*tableWidth + 10);
         text.setY(20);
     }
 
     private void setPieces(){
-        Circle circle = new Circle();
-        circle.setRadius(tileSize/2 - 1.5f);
-        circle.setStrokeWidth(3);
-        circle.setStroke(Color.BLACK);
-
         for(int i = 0; i<tableHeight; i++) {
             for (int j = 0; j < tableWidth; j++) {
 
-                if (gameBoard.getTile(j,i) == 1) {
-                    circle.setFill(Color.web(playerPiece[0]));
-                } else if (gameBoard.getTile(j,i) == 2){
-                    circle.setFill(Color.web(playerPiece[1]));
+                if (gameBoard.getTile(j,i) == 1 || gameBoard.getTile(j,i) == 2) {
+                    Piece piece = new Piece(i,j,gameBoard.getTile(j,i)%2 == 1);
+                    allPieces.add(piece);
                 } else continue;
-
-                Piece piece = new Piece(i,j,circle);
-                allPieces.add(piece);
             }
         }
     }
 
     private void paintAll(){
+        gridPane.getChildren().clear();
         for(Tile t: allTiles){
-            gridPane.add(t.getSprite(), t.getPosX(), t.getPosY());
-            for(Piece p:allPieces){
-                if(t.getPosX() == p.getPosX() && t.getPosY() == p.getPosY()){
-                    gridPane.add(p.getSprite(), p.getPosX(), p.getPosY());
-                    break;
-                }
+            Piece p = allPieces.stream()
+                    .filter(piece -> piece.getPosX() == t.getPosX() && piece.getPosY() == t.getPosY())
+                    .findFirst()
+                    .orElse(null);
+
+            if(p != null && p == selectedPiece){
+                Rectangle rect = new Rectangle(0, 0, tileSize, tileSize);
+                rect.setFill(Color.web(selectedTile));
+                gridPane.add(rect, t.getPosY(), t.getPosX());
+            } else gridPane.add(t.getSprite(), t.getPosY(), t.getPosX());
+
+            if(p != null) {
+                gridPane.add(p.getSprite(), p.getPosY(), p.getPosX());
             }
         }
-    }
-
-
-    private void paintTile(){
-//
-//        Circle queen = new Circle();
-//        queen.setRadius(tileSize/4 - 1.5f);
-//        if (gameBoard.getTile(j,i) == 3 || gameBoard.getTile(j,i) == 4){
-//            queen.setFill(Color.BLACK);
-//        } else return;
-//        gridPane.add(queen, j, i);
-//
     }
 
     private void addGridEvent() {
@@ -114,14 +100,23 @@ public class FxMain extends Application {
                 @Override
                 public void handle(MouseEvent event) {
                     System.out.println(GridPane.getColumnIndex(item) + " " + GridPane.getRowIndex(item));
+                    Piece p = allPieces.stream()
+                            .filter(piece -> piece.getPosX() == GridPane.getRowIndex(item) && piece.getPosY() == GridPane.getColumnIndex(item))
+                            .findFirst()
+                            .orElse(null);
+                    if(p != null){
+                        if(p.getColor() == currentPlayer){
+                            selectedPiece = p;
+                            paintAll();
+                        }
+                    }
                 }
             });
         });
     }
 
-
     @Override
-    public void start(Stage primaryStage) throws Exception{
+    public void start(Stage primaryStage){
         gridPane.setMinSize(tileSize*tableWidth, tileSize*tableHeight);
 
         Group root = new Group(text, gridPane);
