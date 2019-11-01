@@ -34,8 +34,13 @@ public class FxMain extends Application {
     public static String[] tileColor = {"#a88132", "#32a881"};
     public static String selectedTile = "#3882c2";
 
-    private ArrayList<Piece> allPieces = new ArrayList();
+    public static ArrayList<Piece> allPieces = new ArrayList();
     private ArrayList<Tile> allTiles = new ArrayList();
+
+    public static void changePlayer(){
+        selectedPiece = null;
+        currentPlayer = !currentPlayer;
+    }
 
     private void setTiles(){
         boolean color = false;

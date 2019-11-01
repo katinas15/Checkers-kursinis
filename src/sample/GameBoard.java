@@ -1,5 +1,10 @@
 package sample;
 
+import javafx.scene.layout.GridPane;
+
+import static sample.FxMain.allPieces;
+import static sample.FxMain.changePlayer;
+
 public class GameBoard {
 
     public static int tableWidth = 8;
@@ -25,7 +30,12 @@ public class GameBoard {
 
         } else {
             if(checkStep(selectedPiece, toX, toY)){
-                selectedPiece.setPosition(toX, toY);
+                if(checkHit(toX, toY)){
+                    selectedPiece.setPosition(toX + (toX - selectedPiece.getPosX()), toY + (toY - selectedPiece.getPosY()));
+                } else {
+                    selectedPiece.setPosition(toX, toY);
+                    changePlayer();
+                }
             }
         }
     }
@@ -46,26 +56,19 @@ public class GameBoard {
 //        return false;
 //    }
 //
-//    private boolean checkHit(Piece selectedPiece, int toX, int toY){
-//        if(color == 2){
-//            if( (board[toY][toX] == 1 || board[toY][toX] == 3) && board[toY + (toY - pieceY)][toX + (toX - pieceX)] == 0) return true;
-//            if( (board[toY][toX] == 1 || board[toY][toX] == 3) && board[toY - (toY - pieceY)][toX - (toX - pieceX)] == 0) return true;
-//        } else if(color == 1){
-//            if( (board[toY][toX] == 2 || board[toY][toX] == 4) && board[toY + (toY - pieceY)][toX + (toX - pieceX)] == 0) return true;
-//            if( (board[toY][toX] == 2 || board[toY][toX] == 4) && board[toY - (toY - pieceY)][toX - (toX - pieceX)] == 0) return true;
-//        } else if (color == 3){
-//            int behindX = toSingle(toX - pieceX);
-//            int behindY = toSingle(toY - pieceY);
-//            if( (board[toY][toX] == 2 || board[toY][toX] == 4) && board[toY + behindY][toX + behindX] == 0) return true;
-//            if( (board[toY][toX] == 2 || board[toY][toX] == 4) && board[toY - behindY][toX - behindX] == 0) return true;
-//        } else if (color == 4){
-//            int behindX = toSingle(toX - pieceX);
-//            int behindY = toSingle(toY - pieceY);
-//            if( (board[toY][toX] == 1 || board[toY][toX] == 3) && board[toY + behindY][toX + behindX] == 0) return true;
-//            if( (board[toY][toX] == 1 || board[toY][toX] == 3) && board[toY - behindY][toX - behindX] == 0) return true;
-//        }
-//        return false;
-//    }
+    private boolean checkHit(int toX, int toY){
+        Piece hit = allPieces.stream()
+                .filter(piece -> piece.getPosX() == toX && piece.getPosY() == toY)
+                .findFirst()
+                .orElse(null);
+        if(hit != null) {
+            allPieces.remove(hit);
+            return true;
+        }
+
+        return false;
+    }
+
 
     private boolean checkStep(Piece selectedPiece, int toX, int toY){
         if(!selectedPiece.getColor()){
