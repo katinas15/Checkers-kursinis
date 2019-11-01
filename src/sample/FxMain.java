@@ -4,6 +4,7 @@ import javafx.application.Application;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.TextField;
@@ -45,11 +46,23 @@ public class FxMain extends Application {
                 int val = color? 1 : 0;
                 rect.setFill(Color.web(tileColor[val]));
 
-                Tile tile = new Tile(i,j, rect);
+                Tile tile = new Tile(j,i, rect);
                 allTiles.add(tile);
                 color = !color;
             }
             color = !color;
+        }
+    }
+
+    private void setPieces(){
+        for(int i = 0; i<tableHeight; i++) {
+            for (int j = 0; j < tableWidth; j++) {
+
+                if (gameBoard.getTile(j,i) == 1 || gameBoard.getTile(j,i) == 2) {
+                    Piece piece = new Piece(j,i,gameBoard.getTile(j,i)%2 == 1);
+                    allPieces.add(piece);
+                } else continue;
+            }
         }
     }
 
@@ -62,19 +75,8 @@ public class FxMain extends Application {
         text.setY(20);
     }
 
-    private void setPieces(){
-        for(int i = 0; i<tableHeight; i++) {
-            for (int j = 0; j < tableWidth; j++) {
-
-                if (gameBoard.getTile(j,i) == 1 || gameBoard.getTile(j,i) == 2) {
-                    Piece piece = new Piece(i,j,gameBoard.getTile(j,i)%2 == 1);
-                    allPieces.add(piece);
-                } else continue;
-            }
-        }
-    }
-
     private void paintAll(){
+        setCurrentPlayerText();
         gridPane.getChildren().clear();
         for(Tile t: allTiles){
             Piece p = allPieces.stream()
@@ -85,11 +87,11 @@ public class FxMain extends Application {
             if(p != null && p == selectedPiece){
                 Rectangle rect = new Rectangle(0, 0, tileSize, tileSize);
                 rect.setFill(Color.web(selectedTile));
-                gridPane.add(rect, t.getPosY(), t.getPosX());
-            } else gridPane.add(t.getSprite(), t.getPosY(), t.getPosX());
+                gridPane.add(rect, t.getPosX(), t.getPosY());
+            } else gridPane.add(t.getSprite(), t.getPosX(), t.getPosY());
 
             if(p != null) {
-                gridPane.add(p.getSprite(), p.getPosY(), p.getPosX());
+                gridPane.add(p.getSprite(), p.getPosX(), p.getPosY());
             }
         }
     }
@@ -100,19 +102,28 @@ public class FxMain extends Application {
                 @Override
                 public void handle(MouseEvent event) {
                     System.out.println(GridPane.getColumnIndex(item) + " " + GridPane.getRowIndex(item));
-                    Piece p = allPieces.stream()
-                            .filter(piece -> piece.getPosX() == GridPane.getRowIndex(item) && piece.getPosY() == GridPane.getColumnIndex(item))
-                            .findFirst()
-                            .orElse(null);
-                    if(p != null){
-                        if(p.getColor() == currentPlayer){
-                            selectedPiece = p;
-                            paintAll();
-                        }
+                    selectPiece(item);
+
+                    if(selectedPiece != null){
+                        gameBoard.movePiece(selectedPiece, GridPane.getColumnIndex(item), GridPane.getRowIndex(item));
+                        paintAll();
                     }
                 }
             });
         });
+    }
+
+    private void selectPiece(Node item){
+        Piece p = allPieces.stream()
+                .filter(piece -> piece.getPosX() == GridPane.getColumnIndex(item) && piece.getPosY() == GridPane.getRowIndex(item))
+                .findFirst()
+                .orElse(null);
+        if(p != null){
+            if(p.getColor() == currentPlayer){
+                selectedPiece = p;
+                paintAll();
+            }
+        }
     }
 
     @Override
@@ -129,7 +140,6 @@ public class FxMain extends Application {
         setPieces();
         paintAll();
         addGridEvent();
-        setCurrentPlayerText();
     }
 
 

@@ -12,6 +12,7 @@ public class Piece {
     private boolean color;
     private int posX, posY;
     private Circle sprite;
+    private boolean queen = false;
 
     public Piece(int posX, int posY, boolean color) {
         this.posX = posX;
@@ -42,5 +43,14 @@ public class Piece {
 
     public boolean getColor() {
         return color;
+    }
+
+    public boolean isQueen() {
+        return queen;
+    }
+
+    public void setPosition(int x, int y){
+        this.posX = x;
+        this.posY = y;
     }
 }
