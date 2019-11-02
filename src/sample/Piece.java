@@ -13,7 +13,7 @@ public class Piece {
     private int posX, posY;
     private Circle sprite;
     private Circle queenSprite;
-    private boolean queen = true;
+    private boolean queen = false;
 
     public Piece(int posX, int posY, boolean color) {
         this.posX = posX;

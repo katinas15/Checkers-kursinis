@@ -53,9 +53,23 @@ public class GameBoard {
         if(toX + singleX < 0  || toX + singleX > tableWidth-1 || toY + singleY < 0 || toY + singleY > tableHeight-1) return;
 
         selectedPiece.setPosition(toX + singleX, toY + singleY);
-        if(allowSecondHit(selectedPiece)){
+        if(allowSecondQueenHit(selectedPiece)){
             secondHit = true;
         } else changePlayer();
+    }
+
+    private boolean allowSecondQueenHit(Piece selectedPiece){
+        List<Piece> search = findOpponentsDiagonally(selectedPiece);
+        if(search.size() > 0){
+            for(Piece p:search){
+                int singleX = toSingle(p.getPosX() - selectedPiece.getPosX());
+                int singleY = toSingle(p.getPosY() - selectedPiece.getPosY());
+                if(checkIfTileEmpty(p.getPosX() + singleX, p.getPosY() + singleY)){
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     private boolean checkQueenStep(Piece selectedPiece, int toX, int toY){
@@ -183,7 +197,6 @@ public class GameBoard {
                     return true;
                 } else return false;
             }
-            return true;
         }
         return false;
     }
