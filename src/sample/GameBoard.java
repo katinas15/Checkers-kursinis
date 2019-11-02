@@ -4,6 +4,7 @@ import javafx.scene.layout.GridPane;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static sample.FxMain.*;
 
@@ -29,14 +30,97 @@ public class GameBoard {
 
     public void update(Piece selectedPiece, int toX, int toY){
         if(selectedPiece.isQueen()){
-
+            moveQueen(selectedPiece,toX,toY);
         } else {
             moveStandard(selectedPiece, toX, toY);
         }
     }
 
-    private void moveStandard(Piece selectedPiece, int toX, int toY){
+    private void moveQueen(Piece selectedPiece, int toX, int toY){
+        if(checkQueenHit(selectedPiece, toX, toY)){
+            processQueenHit(selectedPiece, toX, toY);
+        } else if(checkQueenStep(selectedPiece, toX, toY) && !secondHit) {
+            if (checkIfTileEmpty(toX, toY)) {
+                selectedPiece.setPosition(toX, toY);
+                changePlayer();
+            }
+        }
+    }
 
+    private void processQueenHit(Piece selectedPiece, int toX, int toY){
+        int singleX = toSingle(toX - selectedPiece.getPosX());
+        int singleY = toSingle(toY - selectedPiece.getPosY());
+        if(toX + singleX < 0  || toX + singleX > tableWidth-1 || toY + singleY < 0 || toY + singleY > tableHeight-1) return;
+
+        selectedPiece.setPosition(toX + singleX, toY + singleY);
+        if(allowSecondHit(selectedPiece)){
+            secondHit = true;
+        } else changePlayer();
+    }
+
+    private boolean checkQueenStep(Piece selectedPiece, int toX, int toY){
+        int i=1;
+        while(selectedPiece.getPosX()-i >= 0  || selectedPiece.getPosX()+i < tableWidth || selectedPiece.getPosY()-i >= 0  || selectedPiece.getPosY()+i < tableWidth) {
+            if ((selectedPiece.getPosX() + i) == toX && (selectedPiece.getPosY() + i) == toY) return true;
+            if ((selectedPiece.getPosX() - i) == toX && (selectedPiece.getPosY() + i) == toY) return true;
+            if ((selectedPiece.getPosX() + i) == toX && (selectedPiece.getPosY() - i) == toY) return true;
+            if ((selectedPiece.getPosX() - i) == toX && (selectedPiece.getPosY() - i) == toY) return true;
+            i++;
+        }
+        System.out.println("incorrect destination");
+        return false;
+    }
+
+    private boolean checkQueenHit(Piece selectedPiece, int toX, int toY){
+        Piece hit = allPieces.stream()
+                .filter(piece -> piece.getPosX() == toX && piece.getPosY() == toY)
+                .findFirst()
+                .orElse(null);
+        if(hit != null) {
+            List<Piece> availableOppenents = findOpponentsDiagonally(selectedPiece);
+            if(availableOppenents.size() > 0){  //tikrinama ar pasirinkta figura galima kirsti, t.y. ar ta figura yra salia pasirinktos
+                for(Piece p: availableOppenents){
+                    if(p.getPosX() == toX && p.getPosY() == toY){
+                        int singleX = toSingle(toX - selectedPiece.getPosX());
+                        int singleY = toSingle(toY - selectedPiece.getPosY());
+                        if(checkIfTileEmpty(toX + singleX, toY + singleY)){
+                            allPieces.remove(hit);
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    private int toSingle(int number){
+        if(number > 0)return 1;
+        else if (number < 0)return -1;
+        else return 0;
+    }
+
+    private List<Piece> findOpponentsDiagonally(Piece selectedPiece){
+        List<Piece> diagonalOpponents = findNearbyOpponents(selectedPiece);
+
+        int i=2;
+        while(selectedPiece.getPosX()-i >= 0  || selectedPiece.getPosX()+i < tableWidth || selectedPiece.getPosY()-i >= 0  || selectedPiece.getPosY()+i < tableWidth){
+            int finalI = i;
+            List<Piece> foundOpponents = allPieces.stream()
+                    .filter(   piece -> piece.getPosX() == selectedPiece.getPosX() + finalI && piece.getPosY() == selectedPiece.getPosY() + finalI && piece.getColor() == !selectedPiece.getColor()
+                            || piece.getPosX() == selectedPiece.getPosX() + finalI && piece.getPosY() == selectedPiece.getPosY() - finalI && piece.getColor() == !selectedPiece.getColor()
+                            || piece.getPosX() == selectedPiece.getPosX() - finalI && piece.getPosY() == selectedPiece.getPosY() + finalI && piece.getColor() == !selectedPiece.getColor()
+                            || piece.getPosX() == selectedPiece.getPosX() - finalI && piece.getPosY() == selectedPiece.getPosY() - finalI && piece.getColor() == !selectedPiece.getColor()
+                    )
+                    .collect(Collectors.toList());
+
+            diagonalOpponents = Stream.concat(diagonalOpponents.stream(),foundOpponents.stream()).collect(Collectors.toList());
+            i++;
+        }
+        return diagonalOpponents;
+    }
+
+    private void moveStandard(Piece selectedPiece, int toX, int toY){
         if(checkHit(selectedPiece, toX, toY)){
             processHit(selectedPiece,toX,toY);
         } else if(checkStep(selectedPiece, toX, toY) && !secondHit) {
@@ -45,9 +129,7 @@ public class GameBoard {
                 changePlayer();
             }
         }
-
         checkChangeToQueen(selectedPiece);
-
     }
 
     private void checkChangeToQueen(Piece selectedPiece){
@@ -57,7 +139,7 @@ public class GameBoard {
     }
 
     private void processHit(Piece selectedPiece, int toX, int toY){
-        if(toX + (toX - selectedPiece.getPosX()) < 0  || toX + (toX - selectedPiece.getPosX()) > tableWidth-1 || toX + (toX - selectedPiece.getPosX()) < 0 || toX + (toX - selectedPiece.getPosX()) > tableHeight-1) return;
+        if(toX + (toX - selectedPiece.getPosX()) < 0  || toX + (toX - selectedPiece.getPosX()) > tableWidth-1 || toY + (toY - selectedPiece.getPosY()) < 0 || toY + (toY - selectedPiece.getPosY()) > tableHeight-1) return;
         selectedPiece.setPosition(toX + (toX - selectedPiece.getPosX()), toY + (toY - selectedPiece.getPosY()));
             if(allowSecondHit(selectedPiece)){
                 secondHit = true;
@@ -65,13 +147,7 @@ public class GameBoard {
     }
 
     private boolean allowSecondHit(Piece selectedPiece){
-        List<Piece> search = allPieces.stream()
-                .filter(   piece -> piece.getPosX() == selectedPiece.getPosX() + 1 && piece.getPosY() == selectedPiece.getPosY() + 1 && piece.getColor() == !selectedPiece.getColor()
-                        || piece.getPosX() == selectedPiece.getPosX() + 1 && piece.getPosY() == selectedPiece.getPosY() - 1 && piece.getColor() == !selectedPiece.getColor()
-                        || piece.getPosX() == selectedPiece.getPosX() - 1 && piece.getPosY() == selectedPiece.getPosY() + 1 && piece.getColor() == !selectedPiece.getColor()
-                        || piece.getPosX() == selectedPiece.getPosX() - 1 && piece.getPosY() == selectedPiece.getPosY() - 1 && piece.getColor() == !selectedPiece.getColor()
-                        )
-                .collect(Collectors.toList());
+        List<Piece> search = findNearbyOpponents(selectedPiece);
         if(search.size() > 0){
             for(Piece p:search){
                 if(checkIfTileEmpty(p.getPosX() + (p.getPosX() - selectedPiece.getPosX()), p.getPosY() + (p.getPosY() - selectedPiece.getPosY()))){
@@ -81,6 +157,16 @@ public class GameBoard {
             return true;
         }
         return false;
+    }
+
+    private List<Piece> findNearbyOpponents(Piece selectedPiece){
+        return allPieces.stream()
+            .filter(   piece -> piece.getPosX() == selectedPiece.getPosX() + 1 && piece.getPosY() == selectedPiece.getPosY() + 1 && piece.getColor() == !selectedPiece.getColor()
+                    || piece.getPosX() == selectedPiece.getPosX() + 1 && piece.getPosY() == selectedPiece.getPosY() - 1 && piece.getColor() == !selectedPiece.getColor()
+                    || piece.getPosX() == selectedPiece.getPosX() - 1 && piece.getPosY() == selectedPiece.getPosY() + 1 && piece.getColor() == !selectedPiece.getColor()
+                    || piece.getPosX() == selectedPiece.getPosX() - 1 && piece.getPosY() == selectedPiece.getPosY() - 1 && piece.getColor() == !selectedPiece.getColor()
+            )
+            .collect(Collectors.toList());
     }
 
     private boolean checkIfTileEmpty(int toX,int toY){
@@ -102,13 +188,7 @@ public class GameBoard {
                 .findFirst()
                 .orElse(null);
         if(hit != null) {
-            List<Piece> availableOppenents = allPieces.stream()
-                    .filter(   piece -> piece.getPosX() == selectedPiece.getPosX() + 1 && piece.getPosY() == selectedPiece.getPosY() + 1 && piece.getColor() == !selectedPiece.getColor()
-                                     || piece.getPosX() == selectedPiece.getPosX() + 1 && piece.getPosY() == selectedPiece.getPosY() - 1 && piece.getColor() == !selectedPiece.getColor()
-                                     || piece.getPosX() == selectedPiece.getPosX() - 1 && piece.getPosY() == selectedPiece.getPosY() + 1 && piece.getColor() == !selectedPiece.getColor()
-                                     || piece.getPosX() == selectedPiece.getPosX() - 1 && piece.getPosY() == selectedPiece.getPosY() - 1 && piece.getColor() == !selectedPiece.getColor()
-                    )
-                    .collect(Collectors.toList());
+            List<Piece> availableOppenents = findNearbyOpponents(selectedPiece);
             if(availableOppenents.size() > 0){  //tikrinama ar pasirinkta figura galima kirsti, t.y. ar ta figura yra salia pasirinktos
                 for(Piece p: availableOppenents){
                     if(p.getPosX() == toX && p.getPosY() == toY){
