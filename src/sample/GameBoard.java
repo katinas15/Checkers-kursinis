@@ -29,46 +29,58 @@ public class GameBoard {
         if(selectedPiece.isQueen()){
 
         } else {
-            if(checkStep(selectedPiece, toX, toY)){
-                if(checkHit(toX, toY)){
-                    selectedPiece.setPosition(toX + (toX - selectedPiece.getPosX()), toY + (toY - selectedPiece.getPosY()));
-                } else {
+            moveStandard(selectedPiece, toX, toY);
+        }
+    }
+
+    private void moveStandard(Piece selectedPiece, int toX, int toY){
+        if(checkStep(selectedPiece, toX, toY)){
+            if(checkHit(selectedPiece, toX, toY)){
+                selectedPiece.setPosition(toX + (toX - selectedPiece.getPosX()), toY + (toY - selectedPiece.getPosY()));
+            } else {
+                if(checkIfTileEmpty(toX, toY)){
                     selectedPiece.setPosition(toX, toY);
                     changePlayer();
                 }
+
             }
         }
     }
 
-//    private void changeToQueen(int color, int pieceX,int pieceY){
-//        if(color == 2 && pieceY == tableHeight-1) board[pieceY][pieceX] = 4;
-//        if(color == 1 && pieceY == 0) board[pieceY][pieceX] = 3;
-//    }
-//
-//    private boolean allowSecondHit(int color,int pieceX, int pieceY){
-//        if(color == 1 || color == 2){
-//            if((checkHit(color,pieceX, pieceY, pieceX + 1, pieceY + 1))) return true;
-//            if((checkHit(color,pieceX, pieceY, pieceX + 1, pieceY - 1))) return true;
-//            if((checkHit(color,pieceX, pieceY, pieceX - 1, pieceY - 1))) return true;
-//            if((checkHit(color,pieceX, pieceY, pieceX - 1, pieceY + 1))) return true;
-//        }
-//
-//        return false;
-//    }
-//
-    private boolean checkHit(int toX, int toY){
+    private boolean allowSecondHit(Piece selectedPiece, int toX, int toY){
+        Piece hit = allPieces.stream()
+                .filter(piece -> piece.getPosX() == toX && piece.getPosY() == toY)
+                .findFirst()
+                .orElse(null);
+
+        return false;
+    }
+
+    private boolean checkIfTileEmpty(int toX,int toY){
+        Piece tile = allPieces.stream()
+                .filter(piece -> piece.getPosX() == toX && piece.getPosY() == toY)
+                .findFirst()
+                .orElse(null);
+        if(tile != null) {
+            System.out.println("Opponent is blocking the way!");
+            return false;
+        }
+        return true;
+    }
+
+    private boolean checkHit(Piece selectedPiece, int toX, int toY){
         Piece hit = allPieces.stream()
                 .filter(piece -> piece.getPosX() == toX && piece.getPosY() == toY)
                 .findFirst()
                 .orElse(null);
         if(hit != null) {
-            allPieces.remove(hit);
-            return true;
+            if(checkIfTileEmpty(toX + (toX - selectedPiece.getPosX()), toY + (toY - selectedPiece.getPosY()))){
+                allPieces.remove(hit);
+                return true;
+            }
         }
-
         return false;
     }
-
 
     private boolean checkStep(Piece selectedPiece, int toX, int toY){
         if(!selectedPiece.getColor()){
