@@ -100,6 +100,9 @@ public class FxMain extends Application {
 
             if(p != null) {
                 gridPane.add(p.getSprite(), p.getPosX(), p.getPosY());
+                if(p.isQueen()){
+                    gridPane.add(p.getQueenSprite(), p.getPosX(), p.getPosY());
+                }
             }
         }
     }

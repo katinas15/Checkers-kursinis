@@ -12,6 +12,7 @@ public class Piece {
     private boolean color;
     private int posX, posY;
     private Circle sprite;
+    private Circle queenSprite;
     private boolean queen = false;
 
     public Piece(int posX, int posY, boolean color) {
@@ -27,6 +28,10 @@ public class Piece {
 
         int val = color? 0 : 1;
         sprite.setFill(Color.web(playerPieceColor[val]));
+
+        queenSprite = new Circle();
+        queenSprite.setRadius(tileSize/3f);
+        queenSprite.setFill(Color.BLACK);
     }
 
     public Circle getSprite() {
@@ -52,5 +57,13 @@ public class Piece {
     public void setPosition(int x, int y){
         this.posX = x;
         this.posY = y;
+    }
+
+    public void changeToQueen(){
+        queen = true;
+    }
+
+    public Circle getQueenSprite() {
+        return queenSprite;
     }
 }

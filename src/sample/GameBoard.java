@@ -46,6 +46,14 @@ public class GameBoard {
             }
         }
 
+        checkChangeToQueen(selectedPiece);
+
+    }
+
+    private void checkChangeToQueen(Piece selectedPiece){
+        if(selectedPiece.getColor()){
+            if(selectedPiece.getPosY() == 0) selectedPiece.changeToQueen();
+        } else if(selectedPiece.getPosY() == tableHeight-1) selectedPiece.changeToQueen();
     }
 
     private void processHit(Piece selectedPiece, int toX, int toY){
