@@ -2,6 +2,9 @@ package sample;
 
 import javafx.scene.layout.GridPane;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import static sample.FxMain.*;
 
 public class GameBoard {
@@ -33,38 +36,47 @@ public class GameBoard {
     }
 
     private void moveStandard(Piece selectedPiece, int toX, int toY){
-        if(checkStep(selectedPiece, toX, toY)){
-            if(checkHit(selectedPiece, toX, toY)){
-                processHit(selectedPiece,toX,toY);
-            } else {
-                 if(checkIfTileEmpty(toX, toY)){
-                    selectedPiece.setPosition(toX, toY);
-                    changePlayer();
-                }
-            }
-        } else if(checkHit(selectedPiece, toX, toY)){
+
+        if(checkHit(selectedPiece, toX, toY)){
             processHit(selectedPiece,toX,toY);
+        } else if(checkStep(selectedPiece, toX, toY) && !secondHit) {
+            if(checkIfTileEmpty(toX, toY)){
+                selectedPiece.setPosition(toX, toY);
+                changePlayer();
+            }
         }
+
     }
 
     private void processHit(Piece selectedPiece, int toX, int toY){
+        if(toX + (toX - selectedPiece.getPosX()) < 0  || toX + (toX - selectedPiece.getPosX()) > tableWidth-1 || toX + (toX - selectedPiece.getPosX()) < 0 || toX + (toX - selectedPiece.getPosX()) > tableHeight-1) return;
         selectedPiece.setPosition(toX + (toX - selectedPiece.getPosX()), toY + (toY - selectedPiece.getPosY()));
-//                if(allowSecondHit(selectedPiece)){
-//                    secondHit = true;
-//                }
+            if(allowSecondHit(selectedPiece)){
+                secondHit = true;
+            } else changePlayer();
     }
 
-//    private boolean allowSecondHit(Piece selectedPiece){
-//
-//        Piece hit = allPieces.stream()
-//                .filter(piece -> piece.getPosX() == toX && piece.getPosY() == toY)
-//                .findFirst()
-//                .orElse(null);
-//
-//        return false;
-//    }
+    private boolean allowSecondHit(Piece selectedPiece){
+        List<Piece> search = allPieces.stream()
+                .filter(   piece -> piece.getPosX() == selectedPiece.getPosX() + 1 && piece.getPosY() == selectedPiece.getPosY() + 1 && piece.getColor() == !selectedPiece.getColor()
+                        || piece.getPosX() == selectedPiece.getPosX() + 1 && piece.getPosY() == selectedPiece.getPosY() - 1 && piece.getColor() == !selectedPiece.getColor()
+                        || piece.getPosX() == selectedPiece.getPosX() - 1 && piece.getPosY() == selectedPiece.getPosY() + 1 && piece.getColor() == !selectedPiece.getColor()
+                        || piece.getPosX() == selectedPiece.getPosX() - 1 && piece.getPosY() == selectedPiece.getPosY() - 1 && piece.getColor() == !selectedPiece.getColor()
+                        )
+                .collect(Collectors.toList());
+        if(search.size() > 0){
+            for(Piece p:search){
+                if(checkIfTileEmpty(p.getPosX() + (p.getPosX() - selectedPiece.getPosX()), p.getPosY() + (p.getPosY() - selectedPiece.getPosY()))){
+                    return true;
+                } else return false;
+            }
+            return true;
+        }
+        return false;
+    }
 
     private boolean checkIfTileEmpty(int toX,int toY){
+        if(toX < 0  || toX > tableWidth-1 || toY < 0 || toY > tableHeight-1) return false;
         Piece tile = allPieces.stream()
                 .filter(piece -> piece.getPosX() == toX && piece.getPosY() == toY)
                 .findFirst()
@@ -82,9 +94,22 @@ public class GameBoard {
                 .findFirst()
                 .orElse(null);
         if(hit != null) {
-            if(checkIfTileEmpty(toX + (toX - selectedPiece.getPosX()), toY + (toY - selectedPiece.getPosY()))){
-                allPieces.remove(hit);
-                return true;
+            List<Piece> availableOppenents = allPieces.stream()
+                    .filter(   piece -> piece.getPosX() == selectedPiece.getPosX() + 1 && piece.getPosY() == selectedPiece.getPosY() + 1 && piece.getColor() == !selectedPiece.getColor()
+                                     || piece.getPosX() == selectedPiece.getPosX() + 1 && piece.getPosY() == selectedPiece.getPosY() - 1 && piece.getColor() == !selectedPiece.getColor()
+                                     || piece.getPosX() == selectedPiece.getPosX() - 1 && piece.getPosY() == selectedPiece.getPosY() + 1 && piece.getColor() == !selectedPiece.getColor()
+                                     || piece.getPosX() == selectedPiece.getPosX() - 1 && piece.getPosY() == selectedPiece.getPosY() - 1 && piece.getColor() == !selectedPiece.getColor()
+                    )
+                    .collect(Collectors.toList());
+            if(availableOppenents.size() > 0){  //tikrinama ar pasirinkta figura galima kirsti, t.y. ar ta figura yra salia pasirinktos
+                for(Piece p: availableOppenents){
+                    if(p.getPosX() == toX && p.getPosY() == toY){
+                        if(checkIfTileEmpty(toX + (toX - selectedPiece.getPosX()), toY + (toY - selectedPiece.getPosY()))){
+                            allPieces.remove(hit);
+                            return true;
+                        }
+                    }
+                }
             }
         }
         return false;

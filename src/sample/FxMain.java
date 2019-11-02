@@ -125,6 +125,7 @@ public class FxMain extends Application {
     private void selectPiece(Node item){
         if(secondHit){
             System.out.println("Cannot select. Please hit or skip turn!");
+            return;
         }
 
         Piece p = allPieces.stream()
