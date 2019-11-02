@@ -60,6 +60,7 @@ public class GameBoard {
 
     private boolean checkQueenStep(Piece selectedPiece, int toX, int toY){
         int i=1;
+        if(checkInbetween(selectedPiece,toX,toY)) return false;
         while(selectedPiece.getPosX()-i >= 0  || selectedPiece.getPosX()+i < tableWidth || selectedPiece.getPosY()-i >= 0  || selectedPiece.getPosY()+i < tableWidth) {
             if ((selectedPiece.getPosX() + i) == toX && (selectedPiece.getPosY() + i) == toY) return true;
             if ((selectedPiece.getPosX() - i) == toX && (selectedPiece.getPosY() + i) == toY) return true;
@@ -78,19 +79,47 @@ public class GameBoard {
                 .orElse(null);
         if(hit != null) {
             List<Piece> availableOppenents = findOpponentsDiagonally(selectedPiece);
-            if(availableOppenents.size() > 0){  //tikrinama ar pasirinkta figura galima kirsti, t.y. ar ta figura yra salia pasirinktos
+            if(availableOppenents.size() > 0){  //tikrinama ar pasirinkta figura galima kirsti, t.y. ar nieko nera tarpe
                 for(Piece p: availableOppenents){
                     if(p.getPosX() == toX && p.getPosY() == toY){
-                        int singleX = toSingle(toX - selectedPiece.getPosX());
-                        int singleY = toSingle(toY - selectedPiece.getPosY());
-                        if(checkIfTileEmpty(toX + singleX, toY + singleY)){
-                            allPieces.remove(hit);
-                            return true;
+                        if(!checkInbetween(selectedPiece,p)){
+                            int singleX = toSingle(toX - selectedPiece.getPosX());
+                            int singleY = toSingle(toY - selectedPiece.getPosY());
+                            if(checkIfTileEmpty(toX + singleX, toY + singleY)){
+                                allPieces.remove(hit);
+                                return true;
+                            }
                         }
                     }
                 }
             }
         }
+        return false;
+    }
+
+    private boolean checkInbetween(Piece selectedPiece, Piece hitPiece){
+        int distance = Math.abs(selectedPiece.getPosX() - hitPiece.getPosX());
+        for(int i=1;i<distance;i++){
+            int singleX = toSingle(hitPiece.getPosX() - selectedPiece.getPosX()) * i;
+            int singleY = toSingle(hitPiece.getPosY() - selectedPiece.getPosY()) * i;
+            if(!checkIfTileEmpty(selectedPiece.getPosX() + singleX, selectedPiece.getPosY() + singleY)){
+                return true;
+            }
+        }
+        System.out.println("Something is in the way!");
+        return false;
+    }
+
+    private boolean checkInbetween(Piece selectedPiece, int toX, int toY){
+        int distance = Math.abs(selectedPiece.getPosX() - toX);
+        for(int i=1;i<distance;i++){
+            int singleX = toSingle(toX - selectedPiece.getPosX()) * i;
+            int singleY = toSingle(toY - selectedPiece.getPosY()) * i;
+            if(!checkIfTileEmpty(selectedPiece.getPosX() + singleX, selectedPiece.getPosY() + singleY)){
+                return true;
+            }
+        }
+        System.out.println("Something is in the way!");
         return false;
     }
 
