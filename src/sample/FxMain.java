@@ -7,6 +7,7 @@ import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
@@ -19,6 +20,8 @@ import javafx.stage.Stage;
 import javafx.scene.text.Text;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static sample.GameBoard.*;
 
@@ -28,8 +31,22 @@ public class FxMain extends Application {
     private GridPane gridPane = new GridPane();
     public static Piece selectedPiece;
     public static boolean currentPlayer = true;
-    private GameBoard gameBoard = new GameBoard();
+    int[][] board = {
+            {0, 2, 0, 2, 0, 2, 0, 2},
+            {2, 0, 2, 0, 2, 0, 2, 0},
+            {0, 2, 0, 2, 0, 2, 0, 2},
+            {0, 0, 0, 0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0, 0, 0, 0},
+            {1, 0, 1, 0, 1, 0, 1, 0},
+            {0, 1, 0, 1, 0, 1, 0, 1},
+            {1, 0, 1, 0, 1, 0, 1, 0}
+    };
+    private GameBoard gameBoard = new GameBoard(board);
+
     private Text text = new Text();
+    private Text gameOverText = new Text();
+    private Button endTurnButton = new Button();
+    private Button resetButton = new Button();
     public static String[] playerPieceColor = {"#ede6e4", "#fc3903"};
     public static String[] tileColor = {"#a88132", "#32a881"};
     public static String selectedTile = "#3882c2";
@@ -75,6 +92,7 @@ public class FxMain extends Application {
     }
 
     private void setCurrentPlayerText(){
+
         if(currentPlayer){
             text.setText("Player White");
         } else text.setText("Player Red");
@@ -83,8 +101,72 @@ public class FxMain extends Application {
         text.setY(20);
     }
 
+    private void setEndTurnButton(){
+        endTurnButton.setText("End Turn");
+        endTurnButton.setLayoutX(tileSize*tableWidth + 10);
+        endTurnButton.setLayoutY(40);
+
+        endTurnButton.setOnAction(actionEvent ->  {
+            if(secondHit){
+                changePlayer();
+                paintAll();
+            } else {
+                System.out.println("You must move at least once!");
+            }
+        });
+    }
+
+    private void setResetButton(){
+        resetButton.setText("Reset All");
+        resetButton.setLayoutX(tileSize*tableWidth + 10);
+        resetButton.setLayoutY(80);
+
+        resetButton.setOnAction(actionEvent ->  {
+                resetGame();
+        });
+    }
+
+    private void resetGame(){
+        gameBoard.setBoard(board);
+        secondHit = false;
+        selectedPiece = null;
+        currentPlayer = true;
+        allPieces.removeAll(allPieces);
+        allTiles.removeAll(allTiles);
+        gameOverText.setText("");
+        setTiles();
+        setPieces();
+        paintAll();
+        addGridEvent();
+    }
+
+    private void gameOver(){
+        gameOverText.setX(tileSize*tableWidth + 10);
+        gameOverText.setY(100);
+
+        List<Piece> pieces = allPieces.stream()
+                .filter(   piece -> piece.getColor() == true)
+                .collect(Collectors.toList());
+
+        if(pieces.size() < 1){
+            gameOverText.setText("Player Red Wins!!!");
+            return;
+        }
+
+        pieces = allPieces.stream()
+                .filter(   piece -> piece.getColor() == false)
+                .collect(Collectors.toList());
+
+        if(pieces.size() < 1){
+            gameOverText.setText("Player White Wins!!!");
+            return;
+        }
+    }
+
     private void paintAll(){
         setCurrentPlayerText();
+        setEndTurnButton();
+        setResetButton();
         gridPane.getChildren().clear();
         for(Tile t: allTiles){
             Piece p = allPieces.stream()
@@ -120,6 +202,8 @@ public class FxMain extends Application {
                         gameBoard.update(selectedPiece, GridPane.getColumnIndex(item), GridPane.getRowIndex(item));
                         paintAll();
                     }
+
+                    gameOver();
                 }
             });
         });
@@ -147,7 +231,7 @@ public class FxMain extends Application {
     public void start(Stage primaryStage){
         gridPane.setMinSize(tileSize*tableWidth, tileSize*tableHeight);
 
-        Group root = new Group(text, gridPane);
+        Group root = new Group(text, endTurnButton, gridPane, resetButton);
 
         primaryStage.setTitle("Checkers");
         primaryStage.setScene(new Scene(root, tileSize*tableWidth + 100,  tileSize*tableHeight));
