@@ -176,8 +176,19 @@ public class GameBoard {
 
     private void checkChangeToQueen(Piece selectedPiece){
         if(selectedPiece.getColor()){
-            if(selectedPiece.getPosY() == 0) selectedPiece.changeToQueen();
-        } else if(selectedPiece.getPosY() == tableHeight-1) selectedPiece.changeToQueen();
+            if(selectedPiece.getPosY() == 0) {
+                selectedPiece.changeToQueen();
+                if(selectedPiece.getColor() == currentPlayer){
+                    changePlayer();
+                }
+
+            }
+        } else if(selectedPiece.getPosY() == tableHeight-1){
+            selectedPiece.changeToQueen();
+            if(selectedPiece.getColor() == currentPlayer){
+                changePlayer();
+            }
+        }
     }
 
     private void processHit(Piece selectedPiece, int toX, int toY){
@@ -194,7 +205,7 @@ public class GameBoard {
             for(Piece p:search){
                 if(checkIfTileEmpty(p.getPosX() + (p.getPosX() - selectedPiece.getPosX()), p.getPosY() + (p.getPosY() - selectedPiece.getPosY()))){
                     return true;
-                } else return false;
+                }
             }
         }
         return false;

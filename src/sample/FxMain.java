@@ -41,6 +41,8 @@ public class FxMain extends Application {
             {0, 1, 0, 1, 0, 1, 0, 1},
             {1, 0, 1, 0, 1, 0, 1, 0}
     };
+
+
     private GameBoard gameBoard = new GameBoard(board);
 
     private Text text = new Text();
@@ -141,8 +143,8 @@ public class FxMain extends Application {
     }
 
     private void gameOver(){
-        gameOverText.setX(tileSize*tableWidth + 10);
-        gameOverText.setY(100);
+        gameOverText.setX(tileSize*tableWidth);
+        gameOverText.setY(140);
 
         List<Piece> pieces = allPieces.stream()
                 .filter(   piece -> piece.getColor() == true)
@@ -231,7 +233,7 @@ public class FxMain extends Application {
     public void start(Stage primaryStage){
         gridPane.setMinSize(tileSize*tableWidth, tileSize*tableHeight);
 
-        Group root = new Group(text, endTurnButton, gridPane, resetButton);
+        Group root = new Group(text, endTurnButton, gridPane, resetButton,gameOverText);
 
         primaryStage.setTitle("Checkers");
         primaryStage.setScene(new Scene(root, tileSize*tableWidth + 100,  tileSize*tableHeight));
