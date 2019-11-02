@@ -2,8 +2,7 @@ package sample;
 
 import javafx.scene.layout.GridPane;
 
-import static sample.FxMain.allPieces;
-import static sample.FxMain.changePlayer;
+import static sample.FxMain.*;
 
 public class GameBoard {
 
@@ -25,7 +24,7 @@ public class GameBoard {
         return board[y][x];
     }
 
-    public void movePiece(Piece selectedPiece, int toX, int toY){
+    public void update(Piece selectedPiece, int toX, int toY){
         if(selectedPiece.isQueen()){
 
         } else {
@@ -36,25 +35,34 @@ public class GameBoard {
     private void moveStandard(Piece selectedPiece, int toX, int toY){
         if(checkStep(selectedPiece, toX, toY)){
             if(checkHit(selectedPiece, toX, toY)){
-                selectedPiece.setPosition(toX + (toX - selectedPiece.getPosX()), toY + (toY - selectedPiece.getPosY()));
+                processHit(selectedPiece,toX,toY);
             } else {
-                if(checkIfTileEmpty(toX, toY)){
+                 if(checkIfTileEmpty(toX, toY)){
                     selectedPiece.setPosition(toX, toY);
                     changePlayer();
                 }
-
             }
+        } else if(checkHit(selectedPiece, toX, toY)){
+            processHit(selectedPiece,toX,toY);
         }
     }
 
-    private boolean allowSecondHit(Piece selectedPiece, int toX, int toY){
-        Piece hit = allPieces.stream()
-                .filter(piece -> piece.getPosX() == toX && piece.getPosY() == toY)
-                .findFirst()
-                .orElse(null);
-
-        return false;
+    private void processHit(Piece selectedPiece, int toX, int toY){
+        selectedPiece.setPosition(toX + (toX - selectedPiece.getPosX()), toY + (toY - selectedPiece.getPosY()));
+//                if(allowSecondHit(selectedPiece)){
+//                    secondHit = true;
+//                }
     }
+
+//    private boolean allowSecondHit(Piece selectedPiece){
+//
+//        Piece hit = allPieces.stream()
+//                .filter(piece -> piece.getPosX() == toX && piece.getPosY() == toY)
+//                .findFirst()
+//                .orElse(null);
+//
+//        return false;
+//    }
 
     private boolean checkIfTileEmpty(int toX,int toY){
         Piece tile = allPieces.stream()

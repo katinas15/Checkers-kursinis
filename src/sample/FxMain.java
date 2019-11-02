@@ -34,10 +34,13 @@ public class FxMain extends Application {
     public static String[] tileColor = {"#a88132", "#32a881"};
     public static String selectedTile = "#3882c2";
 
+    public static boolean secondHit = false;
+
     public static ArrayList<Piece> allPieces = new ArrayList();
     private ArrayList<Tile> allTiles = new ArrayList();
 
     public static void changePlayer(){
+        secondHit = false;
         selectedPiece = null;
         currentPlayer = !currentPlayer;
     }
@@ -107,10 +110,11 @@ public class FxMain extends Application {
                 @Override
                 public void handle(MouseEvent event) {
                     System.out.println(GridPane.getColumnIndex(item) + " " + GridPane.getRowIndex(item));
+
                     selectPiece(item);
 
                     if(selectedPiece != null){
-                        gameBoard.movePiece(selectedPiece, GridPane.getColumnIndex(item), GridPane.getRowIndex(item));
+                        gameBoard.update(selectedPiece, GridPane.getColumnIndex(item), GridPane.getRowIndex(item));
                         paintAll();
                     }
                 }
@@ -119,6 +123,10 @@ public class FxMain extends Application {
     }
 
     private void selectPiece(Node item){
+        if(secondHit){
+            System.out.println("Cannot select. Please hit or skip turn!");
+        }
+
         Piece p = allPieces.stream()
                 .filter(piece -> piece.getPosX() == GridPane.getColumnIndex(item) && piece.getPosY() == GridPane.getRowIndex(item))
                 .findFirst()
