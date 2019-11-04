@@ -49,6 +49,7 @@ public class FxMain extends Application {
     private Text gameOverText = new Text();
     private Button endTurnButton = new Button();
     private Button resetButton = new Button();
+
     public static String[] playerPieceColor = {"#ede6e4", "#fc3903"};
     public static String[] tileColor = {"#a88132", "#32a881"};
     public static String selectedTile = "#3882c2";
@@ -70,8 +71,7 @@ public class FxMain extends Application {
         for(int i = 0; i<tableHeight; i++) {
             for (int j = 0; j < tableWidth; j++) {
                 Rectangle rect = new Rectangle(0, 0, tileSize, tileSize);
-                int val = color? 1 : 0;
-                rect.setFill(Color.web(tileColor[val]));
+                rect.setFill(Color.web(tileColor[color? 1 : 0]));
 
                 Tile tile = new Tile(j,i, rect);
                 allTiles.add(tile);
@@ -84,7 +84,6 @@ public class FxMain extends Application {
     private void setPieces(){
         for(int i = 0; i<tableHeight; i++) {
             for (int j = 0; j < tableWidth; j++) {
-
                 if (gameBoard.getTile(j,i) == 1 || gameBoard.getTile(j,i) == 2) {
                     Piece piece = new Piece(j,i,gameBoard.getTile(j,i)%2 == 1);
                     allPieces.add(piece);
