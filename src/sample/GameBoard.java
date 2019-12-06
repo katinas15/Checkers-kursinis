@@ -2,10 +2,12 @@ package sample;
 
 import javafx.scene.layout.GridPane;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static java.lang.Integer.valueOf;
 import static sample.FxMain.*;
 
 public class GameBoard {
@@ -14,6 +16,13 @@ public class GameBoard {
     public static int tableHeight = 8;
 
     int[][] board;
+
+    int [][] diagonalArray = {
+            { 1, 1},
+            { 1,-1},
+            {-1, 1},
+            {-1,-1}
+    };
 
     public GameBoard(int[][] board) {
         this.board = board;
@@ -162,6 +171,9 @@ public class GameBoard {
             diagonalOpponents = Stream.concat(diagonalOpponents.stream(),foundOpponents.stream()).collect(Collectors.toList());
             i++;
         }
+
+
+
         return diagonalOpponents;
     }
 
@@ -198,6 +210,8 @@ public class GameBoard {
 
         int behindHitX = toX + (toX - selectedPiece.getPosX());
         int behindHitY = toY + (toY - selectedPiece.getPosY());
+        if(!checkBounds(behindHitX,behindHitY)) return false;
+
         if(checkTile(behindHitX, behindHitY) == null){
             return true;
         }
@@ -214,26 +228,6 @@ public class GameBoard {
         
         selectedPiece.setPosition(toX + (toX - selectedPiece.getPosX()), toY + (toY - selectedPiece.getPosY()));
     }
-    
-
-    private void checkChangeToQueen(Piece selectedPiece){
-        if(selectedPiece.getColor()){
-            if(selectedPiece.getPosY() == 0) {
-                selectedPiece.changeToQueen();
-                if(selectedPiece.getColor() == currentPlayer){
-                    changePlayer();
-                }
-
-            }
-        } else if(selectedPiece.getPosY() == tableHeight-1){
-            selectedPiece.changeToQueen();
-            if(selectedPiece.getColor() == currentPlayer){
-                changePlayer();
-            }
-        }
-    }
-
-
 
     private void checkSecondHit(Piece selectedPiece){
         List<Piece> search = findNearbyOpponents(selectedPiece);
@@ -249,27 +243,42 @@ public class GameBoard {
         }
 
         changePlayer();
+    }
 
+    private void checkChangeToQueen(Piece selectedPiece){
+        if(selectedPiece.getColor()){
+            if(selectedPiece.getPosY() == 0) {
+                selectedPiece.changeToQueen();
+                changePlayer();
+            }
+        } else if(selectedPiece.getPosY() == tableHeight-1){
+            selectedPiece.changeToQueen();
+            changePlayer();
+        }
     }
 
     private List<Piece> findNearbyOpponents(Piece selectedPiece){
-        return allPieces.stream()
-            .filter(   piece -> piece.getPosX() == selectedPiece.getPosX() + 1 && piece.getPosY() == selectedPiece.getPosY() + 1 && piece.getColor() == !selectedPiece.getColor()
-                    || piece.getPosX() == selectedPiece.getPosX() + 1 && piece.getPosY() == selectedPiece.getPosY() - 1 && piece.getColor() == !selectedPiece.getColor()
-                    || piece.getPosX() == selectedPiece.getPosX() - 1 && piece.getPosY() == selectedPiece.getPosY() + 1 && piece.getColor() == !selectedPiece.getColor()
-                    || piece.getPosX() == selectedPiece.getPosX() - 1 && piece.getPosY() == selectedPiece.getPosY() - 1 && piece.getColor() == !selectedPiece.getColor()
-            )
-            .collect(Collectors.toList());
+        List<Piece> foundOpponents = new ArrayList<Piece>();
+        for (int t[]: diagonalArray) {
+            Piece found = allPieces.stream().filter(piece ->
+                    piece.getPosX() == selectedPiece.getPosX() + t[0]
+                    && piece.getPosY() == selectedPiece.getPosY() - t[1]
+                    && piece.getColor() == !selectedPiece.getColor())
+                    .findFirst().orElse(null);
+            if(found != null) foundOpponents.add(found);
+        }
+
+        return foundOpponents;
     }
 
     private Piece checkTile(int toX,int toY){
         if(!checkBounds(toX,toY)) return new Piece();
-        
+
         Piece tile = allPieces.stream()
                 .filter(piece -> piece.getPosX() == toX && piece.getPosY() == toY)
                 .findFirst()
                 .orElse(null);
-        if(tile != null) {
+        if(tile == null) {
             return null;
         }
         return tile;
