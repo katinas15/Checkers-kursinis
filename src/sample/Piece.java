@@ -15,6 +15,8 @@ public class Piece {
     private Circle queenSprite;
     private boolean queen = false;
 
+    public Piece(){}
+
     public Piece(int posX, int posY, boolean color) {
         this.posX = posX;
         this.posY = posY;

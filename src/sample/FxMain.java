@@ -87,7 +87,7 @@ public class FxMain extends Application {
                 if (gameBoard.getTile(j,i) == 1 || gameBoard.getTile(j,i) == 2) {
                     Piece piece = new Piece(j,i,gameBoard.getTile(j,i)%2 == 1);
                     allPieces.add(piece);
-                } else continue;
+                }
             }
         }
     }

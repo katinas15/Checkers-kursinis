@@ -39,7 +39,7 @@ public class GameBoard {
         if(checkQueenHit(selectedPiece, toX, toY)){
             processQueenHit(selectedPiece, toX, toY);
         } else if(checkQueenStep(selectedPiece, toX, toY) && !secondHit) {
-            if (checkIfTileEmpty(toX, toY)) {
+            if (checkTile(toX, toY) == null) {
                 selectedPiece.setPosition(toX, toY);
                 changePlayer();
             }
@@ -63,7 +63,7 @@ public class GameBoard {
             for(Piece p:search){
                 int singleX = toSingle(p.getPosX() - selectedPiece.getPosX());
                 int singleY = toSingle(p.getPosY() - selectedPiece.getPosY());
-                if(checkIfTileEmpty(p.getPosX() + singleX, p.getPosY() + singleY)){
+                if(checkTile(p.getPosX() + singleX, p.getPosY() + singleY) != null){
                     return true;
                 }
             }
@@ -90,7 +90,10 @@ public class GameBoard {
                 .filter(piece -> piece.getPosX() == toX && piece.getPosY() == toY)
                 .findFirst()
                 .orElse(null);
-        if(hit != null) {
+        if(hit == null) {
+            return false;
+        }
+
             List<Piece> availableOppenents = findOpponentsDiagonally(selectedPiece);
             if(availableOppenents.size() > 0){  //tikrinama ar pasirinkta figura galima kirsti, t.y. ar nieko nera tarpe
                 for(Piece p: availableOppenents){
@@ -98,7 +101,7 @@ public class GameBoard {
                         if(!checkInbetween(selectedPiece,p)){
                             int singleX = toSingle(toX - selectedPiece.getPosX());
                             int singleY = toSingle(toY - selectedPiece.getPosY());
-                            if(checkIfTileEmpty(toX + singleX, toY + singleY)){
+                            if(checkTile(toX + singleX, toY + singleY) == null){
                                 allPieces.remove(hit);
                                 return true;
                             }
@@ -106,7 +109,7 @@ public class GameBoard {
                     }
                 }
             }
-        }
+
         return false;
     }
 
@@ -115,7 +118,7 @@ public class GameBoard {
         for(int i=1;i<distance;i++){
             int singleX = toSingle(hitPiece.getPosX() - selectedPiece.getPosX()) * i;
             int singleY = toSingle(hitPiece.getPosY() - selectedPiece.getPosY()) * i;
-            if(!checkIfTileEmpty(selectedPiece.getPosX() + singleX, selectedPiece.getPosY() + singleY)){
+            if(checkTile(selectedPiece.getPosX() + singleX, selectedPiece.getPosY() + singleY) == null){
                 return true;
             }
         }
@@ -128,7 +131,7 @@ public class GameBoard {
         for(int i=1;i<distance;i++){
             int singleX = toSingle(toX - selectedPiece.getPosX()) * i;
             int singleY = toSingle(toY - selectedPiece.getPosY()) * i;
-            if(!checkIfTileEmpty(selectedPiece.getPosX() + singleX, selectedPiece.getPosY() + singleY)){
+            if(checkTile(selectedPiece.getPosX() + singleX, selectedPiece.getPosY() + singleY) == null){
                 return true;
             }
         }
@@ -163,16 +166,55 @@ public class GameBoard {
     }
 
     private void moveStandard(Piece selectedPiece, int toX, int toY){
+        if(!checkBounds(toX,toY)) return;
+        
         if(checkHit(selectedPiece, toX, toY)){
             processHit(selectedPiece,toX,toY);
+            checkSecondHit(selectedPiece);
+            
         } else if(checkStep(selectedPiece, toX, toY) && !secondHit) {
-            if(checkIfTileEmpty(toX, toY)){
+            if(checkTile(toX, toY) == null){
                 selectedPiece.setPosition(toX, toY);
                 changePlayer();
             }
         }
         checkChangeToQueen(selectedPiece);
     }
+
+    private boolean checkHit(Piece selectedPiece, int toX, int toY){
+        List<Piece> availableOppenents = findNearbyOpponents(selectedPiece);
+        if(availableOppenents.size() < 0){
+            return false;
+        }
+
+        Piece hit = availableOppenents.stream()
+                .filter(piece -> piece.getPosX() == toX && piece.getPosY() == toY)
+                .findFirst()
+                .orElse(null);
+
+        if(hit == null) {
+            return false;
+        }
+
+        int behindHitX = toX + (toX - selectedPiece.getPosX());
+        int behindHitY = toY + (toY - selectedPiece.getPosY());
+        if(checkTile(behindHitX, behindHitY) == null){
+            return true;
+        }
+        
+        return false;
+    }
+
+    private void processHit(Piece selectedPiece, int toX, int toY){
+        Piece hit = allPieces.stream()
+                .filter(piece -> piece.getPosX() == toX && piece.getPosY() == toY)
+                .findFirst()
+                .orElse(null);
+        allPieces.remove(hit);
+        
+        selectedPiece.setPosition(toX + (toX - selectedPiece.getPosX()), toY + (toY - selectedPiece.getPosY()));
+    }
+    
 
     private void checkChangeToQueen(Piece selectedPiece){
         if(selectedPiece.getColor()){
@@ -191,24 +233,23 @@ public class GameBoard {
         }
     }
 
-    private void processHit(Piece selectedPiece, int toX, int toY){
-        if(toX + (toX - selectedPiece.getPosX()) < 0  || toX + (toX - selectedPiece.getPosX()) > tableWidth-1 || toY + (toY - selectedPiece.getPosY()) < 0 || toY + (toY - selectedPiece.getPosY()) > tableHeight-1) return;
-        selectedPiece.setPosition(toX + (toX - selectedPiece.getPosX()), toY + (toY - selectedPiece.getPosY()));
-            if(allowSecondHit(selectedPiece)){
-                secondHit = true;
-            } else changePlayer();
-    }
 
-    private boolean allowSecondHit(Piece selectedPiece){
+
+    private void checkSecondHit(Piece selectedPiece){
         List<Piece> search = findNearbyOpponents(selectedPiece);
-        if(search.size() > 0){
-            for(Piece p:search){
-                if(checkIfTileEmpty(p.getPosX() + (p.getPosX() - selectedPiece.getPosX()), p.getPosY() + (p.getPosY() - selectedPiece.getPosY()))){
-                    return true;
-                }
+        if(search.size() < 0){
+            return;
+        }
+
+        for(Piece p:search){
+            if(checkHit(selectedPiece, p.getPosX(), p.getPosY())){
+                secondHit = true;
+                return;
             }
         }
-        return false;
+
+        changePlayer();
+
     }
 
     private List<Piece> findNearbyOpponents(Piece selectedPiece){
@@ -221,38 +262,17 @@ public class GameBoard {
             .collect(Collectors.toList());
     }
 
-    private boolean checkIfTileEmpty(int toX,int toY){
-        if(toX < 0  || toX > tableWidth-1 || toY < 0 || toY > tableHeight-1) return false;
+    private Piece checkTile(int toX,int toY){
+        if(!checkBounds(toX,toY)) return new Piece();
+        
         Piece tile = allPieces.stream()
                 .filter(piece -> piece.getPosX() == toX && piece.getPosY() == toY)
                 .findFirst()
                 .orElse(null);
         if(tile != null) {
-            System.out.println("Opponent is blocking the way!");
-            return false;
+            return null;
         }
-        return true;
-    }
-
-    private boolean checkHit(Piece selectedPiece, int toX, int toY){
-        Piece hit = allPieces.stream()
-                .filter(piece -> piece.getPosX() == toX && piece.getPosY() == toY)
-                .findFirst()
-                .orElse(null);
-        if(hit != null) {
-            List<Piece> availableOppenents = findNearbyOpponents(selectedPiece);
-            if(availableOppenents.size() > 0){  //tikrinama ar pasirinkta figura galima kirsti, t.y. ar ta figura yra salia pasirinktos
-                for(Piece p: availableOppenents){
-                    if(p.getPosX() == toX && p.getPosY() == toY){
-                        if(checkIfTileEmpty(toX + (toX - selectedPiece.getPosX()), toY + (toY - selectedPiece.getPosY()))){
-                            allPieces.remove(hit);
-                            return true;
-                        }
-                    }
-                }
-            }
-        }
-        return false;
+        return tile;
     }
 
     private boolean checkStep(Piece selectedPiece, int toX, int toY){
@@ -266,5 +286,15 @@ public class GameBoard {
         System.out.println("incorrect destination");
         return false;
     }
+    
+    private boolean checkBounds(int toX, int toY){
+        if(toX < 0) return false;
+        if(toX > tableWidth-1) return false;
+        if(toY < 0) return false;
+        if(toY > tableHeight-1) return false;
+        
+        return true;
+    }
+
 
 }
