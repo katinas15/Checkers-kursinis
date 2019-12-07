@@ -7,33 +7,16 @@ import javafx.scene.shape.Circle;
 import static sample.FxMain.playerPieceColor;
 import static sample.FxMain.tileSize;
 
-public class Piece {
+abstract class Piece {
 
-    private boolean color;
-    private int posX, posY;
-    private Circle sprite;
-    private Circle queenSprite;
-    private boolean queen = false;
-
-    public Piece(){}
+    protected boolean color;
+    protected int posX, posY;
+    protected Circle sprite;
 
     public Piece(int posX, int posY, boolean color) {
         this.posX = posX;
         this.posY = posY;
         this.color = color;
-
-        sprite = new Circle();
-
-        sprite.setRadius(tileSize/2f - 1.5f);
-        sprite.setStrokeWidth(3);
-        sprite.setStroke(Color.BLACK);
-
-        int val = color? 0 : 1;
-        sprite.setFill(Color.web(playerPieceColor[val]));
-
-        queenSprite = new Circle();
-        queenSprite.setRadius(tileSize/3f);
-        queenSprite.setFill(Color.BLACK);
     }
 
     public Circle getSprite() {
@@ -52,20 +35,8 @@ public class Piece {
         return color;
     }
 
-    public boolean isQueen() {
-        return queen;
-    }
-
     public void setPosition(int x, int y){
         this.posX = x;
         this.posY = y;
-    }
-
-    public void changeToQueen(){
-        queen = true;
-    }
-
-    public Circle getQueenSprite() {
-        return queenSprite;
     }
 }
