@@ -113,8 +113,7 @@ public class GameBoard {
         if(checkInbetween(selectedPiece,toX,toY)) return false;
 
         int i=1;
-        while(selectedPiece.getPosX()-i >= 0  || selectedPiece.getPosX()+i < tableWidth
-                || selectedPiece.getPosY()-i >= 0  || selectedPiece.getPosY()+i < tableWidth) {
+        while(isInbounds(selectedPiece, i)) {
             int finalI = i;
             for (int t[]: diagonalArray) {
                 if ((selectedPiece.getPosX() + t[0] * finalI) == toX
@@ -130,12 +129,11 @@ public class GameBoard {
         List<Piece> diagonalOpponents = new ArrayList<>();
 
         int i=1;
-        while(selectedPiece.getPosX()-i >= 0  || selectedPiece.getPosX()+i < tableWidth
-                || selectedPiece.getPosY()-i >= 0  || selectedPiece.getPosY()+i < tableWidth){
+        while(isInbounds(selectedPiece, i)){
             int finalI = i;
             for (int t[]: diagonalArray) {
                 Piece found = allPieces.stream().filter(piece ->
-                        piece.getPosX() == selectedPiece.getPosX() + t[0] * finalI
+                                piece.getPosX() == selectedPiece.getPosX() + t[0] * finalI
                                 && piece.getPosY() == selectedPiece.getPosY() + t[1] * finalI
                                 && piece.getColor() == !selectedPiece.getColor())
                         .findFirst().orElse(null);
@@ -144,6 +142,15 @@ public class GameBoard {
             i++;
         }
         return diagonalOpponents;
+    }
+
+    private boolean isInbounds(Piece selectedPiece, int i){
+        if(selectedPiece.getPosX()-i >= 0) return true;
+        if(selectedPiece.getPosX()+i < tableWidth) return true;
+        if(selectedPiece.getPosY()-i >= 0) return true;
+        if(selectedPiece.getPosY()+i < tableHeight) return true;
+
+        return false;
     }
 
     private boolean checkInbetween(Piece selectedPiece, int toX, int toY){
@@ -215,7 +222,9 @@ public class GameBoard {
                 .orElse(null);
         allPieces.remove(hit);
 
-        selectedPiece.setPosition(toX + (toX - selectedPiece.getPosX()), toY + (toY - selectedPiece.getPosY()));
+        int behindHitX = toX + (toX - selectedPiece.getPosX());
+        int behindHitY = toY + (toY - selectedPiece.getPosY());
+        selectedPiece.setPosition(behindHitX, behindHitY);
     }
 
     private void checkSecondHit(Piece selectedPiece){
@@ -248,7 +257,7 @@ public class GameBoard {
     }
 
     private List<Piece> findNearbyOpponents(Piece selectedPiece){
-        List<Piece> foundOpponents = new ArrayList<Piece>();
+        List<Piece> foundOpponents = new ArrayList<>();
         for (int t[]: diagonalArray) {
             Piece found = allPieces.stream().filter(piece ->
                     piece.getPosX() == selectedPiece.getPosX() + t[0]
