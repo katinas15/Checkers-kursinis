@@ -1,13 +1,8 @@
 package sample;
 
-import javafx.scene.layout.GridPane;
-
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-import static java.lang.Integer.valueOf;
 import static sample.FxMain.*;
 
 public class GameBoard {
@@ -49,11 +44,9 @@ public class GameBoard {
             processQueenHit(selectedPiece, toX, toY);
             allowSecondQueenHit(selectedPiece);
 
-        } else if(checkQueenStep(selectedPiece, toX, toY) && !secondHit) {
-            if (checkTile(toX, toY) == null) {
-                selectedPiece.setPosition(toX, toY);
-                changePlayer();
-            }
+        } else if(checkQueenStep(selectedPiece, toX, toY)) {
+            selectedPiece.setPosition(toX, toY);
+            changePlayer();
         }
     }
 
@@ -71,7 +64,7 @@ public class GameBoard {
             return false;
         }
 
-        if(!checkInbetween(selectedPiece,hit)) return false;
+        if(checkInbetween(selectedPiece, hit.getPosX(), hit.getPosY())) return false;
 
         int behindHitX = toX + toSingle(toX - selectedPiece.getPosX());
         int behindHitY = toY + toSingle(toY - selectedPiece.getPosY());
@@ -116,46 +109,55 @@ public class GameBoard {
     }
 
     private boolean checkQueenStep(Piece selectedPiece, int toX, int toY){
-        int i=1;
+        if (checkTile(toX, toY) != null) return false;
         if(checkInbetween(selectedPiece,toX,toY)) return false;
-        while(selectedPiece.getPosX()-i >= 0  || selectedPiece.getPosX()+i < tableWidth || selectedPiece.getPosY()-i >= 0  || selectedPiece.getPosY()+i < tableWidth) {
-            if ((selectedPiece.getPosX() + i) == toX && (selectedPiece.getPosY() + i) == toY) return true;
-            if ((selectedPiece.getPosX() - i) == toX && (selectedPiece.getPosY() + i) == toY) return true;
-            if ((selectedPiece.getPosX() + i) == toX && (selectedPiece.getPosY() - i) == toY) return true;
-            if ((selectedPiece.getPosX() - i) == toX && (selectedPiece.getPosY() - i) == toY) return true;
+
+        int i=1;
+        while(selectedPiece.getPosX()-i >= 0  || selectedPiece.getPosX()+i < tableWidth
+                || selectedPiece.getPosY()-i >= 0  || selectedPiece.getPosY()+i < tableWidth) {
+            int finalI = i;
+            for (int t[]: diagonalArray) {
+                if ((selectedPiece.getPosX() + t[0] * finalI) == toX
+                        && (selectedPiece.getPosY() + t[1] * finalI) == toY) return true;
+            }
             i++;
         }
         System.out.println("incorrect destination");
         return false;
     }
 
-    private boolean checkInbetween(Piece selectedPiece, Piece hitPiece){
-        int distance = Math.abs(selectedPiece.getPosX() - hitPiece.getPosX());
-        if(distance == 1) return true;
+    private List<Piece> findOpponentsDiagonally(Piece selectedPiece){
+        List<Piece> diagonalOpponents = new ArrayList<>();
 
-        for(int i=1;i<distance;i++){
-            int singleX = toSingle(hitPiece.getPosX() - selectedPiece.getPosX()) * i;
-            int singleY = toSingle(hitPiece.getPosY() - selectedPiece.getPosY()) * i;
-            if(checkTile(selectedPiece.getPosX() + singleX, selectedPiece.getPosY() + singleY) == null){
-                return true;
+        int i=1;
+        while(selectedPiece.getPosX()-i >= 0  || selectedPiece.getPosX()+i < tableWidth
+                || selectedPiece.getPosY()-i >= 0  || selectedPiece.getPosY()+i < tableWidth){
+            int finalI = i;
+            for (int t[]: diagonalArray) {
+                Piece found = allPieces.stream().filter(piece ->
+                        piece.getPosX() == selectedPiece.getPosX() + t[0] * finalI
+                                && piece.getPosY() == selectedPiece.getPosY() + t[1] * finalI
+                                && piece.getColor() == !selectedPiece.getColor())
+                        .findFirst().orElse(null);
+                if(found != null) diagonalOpponents.add(found);
             }
+            i++;
         }
-        System.out.println("Something is in the way!");
-        return false;
+        return diagonalOpponents;
     }
 
     private boolean checkInbetween(Piece selectedPiece, int toX, int toY){
         int distance = Math.abs(selectedPiece.getPosX() - toX);
-        if(distance == 1) return true;
+        if(distance == 1) return false;
 
         for(int i=1;i<distance;i++){
             int singleX = toSingle(toX - selectedPiece.getPosX()) * i;
             int singleY = toSingle(toY - selectedPiece.getPosY()) * i;
-            if(checkTile(selectedPiece.getPosX() + singleX, selectedPiece.getPosY() + singleY) == null){
+            if(checkTile(selectedPiece.getPosX() + singleX, selectedPiece.getPosY() + singleY) != null){
+                System.out.println("Something is in the way!");
                 return true;
             }
         }
-        System.out.println("Something is in the way!");
         return false;
     }
 
@@ -165,37 +167,17 @@ public class GameBoard {
         else return 0;
     }
 
-    private List<Piece> findOpponentsDiagonally(Piece selectedPiece){
-        List<Piece> diagonalOpponents = new ArrayList<Piece>();
-
-        int i=1;
-        while(selectedPiece.getPosX()-i >= 0  || selectedPiece.getPosX()+i < tableWidth || selectedPiece.getPosY()-i >= 0  || selectedPiece.getPosY()+i < tableWidth){
-            int finalI = i;
-            for (int t[]: diagonalArray) {
-                Piece found = allPieces.stream().filter(piece ->
-                            piece.getPosX() == selectedPiece.getPosX() + t[0] * finalI
-                            && piece.getPosY() == selectedPiece.getPosY() + t[1] * finalI
-                            && piece.getColor() == !selectedPiece.getColor())
-                        .findFirst().orElse(null);
-                if(found != null) diagonalOpponents.add(found);
-            }
-            i++;
-        }
-        return diagonalOpponents;
-    }
-
     private void moveStandard(Piece selectedPiece, int toX, int toY){
         if(!checkBounds(toX,toY)) return;
-        
+
         if(checkHit(selectedPiece, toX, toY)){
             processHit(selectedPiece,toX,toY);
             checkSecondHit(selectedPiece);
-            
-        } else if(checkStep(selectedPiece, toX, toY) && !secondHit) {
-            if(checkTile(toX, toY) == null){
-                selectedPiece.setPosition(toX, toY);
-                changePlayer();
-            }
+
+        } else if(checkStep(selectedPiece, toX, toY)) {
+            selectedPiece.setPosition(toX, toY);
+            changePlayer();
+
         }
         checkChangeToQueen(selectedPiece);
     }
@@ -222,7 +204,7 @@ public class GameBoard {
         if(checkTile(behindHitX, behindHitY) == null){
             return true;
         }
-        
+
         return false;
     }
 
@@ -232,7 +214,7 @@ public class GameBoard {
                 .findFirst()
                 .orElse(null);
         allPieces.remove(hit);
-        
+
         selectedPiece.setPosition(toX + (toX - selectedPiece.getPosX()), toY + (toY - selectedPiece.getPosY()));
     }
 
@@ -293,6 +275,8 @@ public class GameBoard {
     }
 
     private boolean checkStep(Piece selectedPiece, int toX, int toY){
+        if (checkTile(toX, toY) != null) return false;
+
         if(!selectedPiece.getColor()){
             if( (selectedPiece.getPosX() + 1) == toX && (selectedPiece.getPosY() + 1) == toY) return true;
             if( (selectedPiece.getPosX() - 1) == toX && (selectedPiece.getPosY() + 1) == toY) return true;
@@ -303,13 +287,13 @@ public class GameBoard {
         System.out.println("incorrect destination");
         return false;
     }
-    
+
     private boolean checkBounds(int toX, int toY){
         if(toX < 0) return false;
         if(toX > tableWidth-1) return false;
         if(toY < 0) return false;
         if(toY > tableHeight-1) return false;
-        
+
         return true;
     }
 
