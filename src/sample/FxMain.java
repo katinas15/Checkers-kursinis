@@ -24,6 +24,7 @@ public class FxMain extends Application {
     public static String[] tileColor = {"#a88132", "#32a881"};
     public static String selectedTileColor = "#3882c2";
     public static int tileSize = 50;
+    public static int strokeSize = 3;
 
     private GridPane gridPane = new GridPane();
     public static Piece selectedPiece;
@@ -35,7 +36,7 @@ public class FxMain extends Application {
             {0, 2, 0, 2, 0, 2, 0, 2},
             {0, 0, 0, 0, 0, 0, 0, 0},
             {0, 0, 0, 0, 0, 0, 0, 0},
-            {1, 0, 1, 0, 1, 0, 1, 0},
+            {1, 0, 3, 0, 1, 0, 1, 0},
             {0, 1, 0, 1, 0, 1, 0, 1},
             {1, 0, 1, 0, 1, 0, 1, 0}
     };
@@ -76,10 +77,15 @@ public class FxMain extends Application {
     }
 
     private void setPieces(){
+        GetPieceFactory pieceFactory = new GetPieceFactory();
         for(int i = 0; i<tableHeight; i++) {
             for (int j = 0; j < tableWidth; j++) {
+                boolean color = gameBoard.getTile(j,i)%2 == 1;
                 if (gameBoard.getTile(j,i) == 1 || gameBoard.getTile(j,i) == 2) {
-                    Piece piece = new Piece(j,i,gameBoard.getTile(j,i)%2 == 1);
+                    Piece piece = pieceFactory.getPiece("REGULAR",j,i, color);
+                    allPieces.add(piece);
+                } else if (gameBoard.getTile(j,i) == 3 || gameBoard.getTile(j,i) == 4) {
+                    Piece piece = pieceFactory.getPiece("QUEEN",j,i,color);
                     allPieces.add(piece);
                 }
             }

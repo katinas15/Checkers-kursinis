@@ -32,11 +32,11 @@ public class GameBoard {
     }
 
     public void update(Piece selectedPiece, int toX, int toY){
-        if(selectedPiece.isQueen()){
-            moveQueen(selectedPiece,toX,toY);
-        } else {
+//        if(selectedPiece.isQueen()){
+//            moveQueen(selectedPiece,toX,toY);
+//        } else {
             moveStandard(selectedPiece, toX, toY);
-        }
+//        }
     }
 
     private void moveQueen(Piece selectedPiece, int toX, int toY){
@@ -252,7 +252,8 @@ public class GameBoard {
             return;
         }
 
-        selectedPiece.changeToQueen();
+        GetPieceFactory pieceFactory = new GetPieceFactory();
+        selectedPiece = pieceFactory.getPiece("QUEEN",selectedPiece.getPosX(),selectedPiece.getPosY(),selectedPiece.getColor());
         if(selectedPiece.getColor() == currentPlayer) changePlayer();
     }
 
@@ -271,7 +272,7 @@ public class GameBoard {
     }
 
     private Piece checkTile(int toX,int toY){
-        if(!checkBounds(toX,toY)) return new Piece();
+        if(!checkBounds(toX,toY)) return null;
 
         Piece tile = allPieces.stream()
                 .filter(piece -> piece.getPosX() == toX && piece.getPosY() == toY)

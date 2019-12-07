@@ -3,6 +3,7 @@ package sample;
 import javafx.scene.Group;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.Shape;
 
 import static sample.FxMain.playerPieceColor;
 import static sample.FxMain.tileSize;
@@ -11,7 +12,7 @@ abstract class Piece {
 
     protected boolean color;
     protected int posX, posY;
-    protected Circle sprite;
+    protected Shape sprite;
 
     public Piece(int posX, int posY, boolean color) {
         this.posX = posX;
@@ -19,7 +20,7 @@ abstract class Piece {
         this.color = color;
     }
 
-    public Circle getSprite() {
+    public Shape getSprite() {
         return sprite;
     }
 
