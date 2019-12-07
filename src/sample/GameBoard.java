@@ -7,20 +7,15 @@ import static sample.FxMain.*;
 
 public class GameBoard {
 
-    public static int tableWidth = 8;
-    public static int tableHeight = 8;
+    public static int tableWidth;
+    public static int tableHeight;
 
     int[][] board;
 
-    int [][] diagonalArray = {
-            { 1, 1},
-            { 1,-1},
-            {-1, 1},
-            {-1,-1}
-    };
-
     public GameBoard(int[][] board) {
         this.board = board;
+        tableWidth = board[0].length;
+        tableHeight = board.length;
     }
 
     public void setBoard(int[][] board) {
