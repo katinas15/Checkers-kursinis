@@ -1,8 +1,6 @@
 package sample;
 
-import static sample.FxMain.allPieces;
-import static sample.GameBoard.tableHeight;
-import static sample.GameBoard.tableWidth;
+import static sample.GameBoard.*;
 
 public class StandardPieceMethods {
     public boolean checkBounds(int toX, int toY){

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static sample.FxMain.*;
-import static sample.GameBoard.tableHeight;
+import static sample.GameBoard.*;
 
 public class RegularPieceController implements PieceControllerStrategy {
     StandardPieceMethods SPM = new StandardPieceMethods();
