@@ -19,9 +19,7 @@ public class StandardPieceMethods {
                 .filter(piece -> piece.getPosX() == toX && piece.getPosY() == toY)
                 .findFirst()
                 .orElse(null);
-        if(tile == null) {
-            return null;
-        }
+        if(tile == null) return null;
         return tile;
     }
 

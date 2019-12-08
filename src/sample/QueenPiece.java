@@ -11,8 +11,6 @@ public class QueenPiece extends Piece {
 
     public QueenPiece(int posX, int posY, boolean color) {
         super(posX, posY, color);
-
-
         int val = color? 0 : 1;
         sprite = new Rectangle(0, 0, tileSize/1.25f, tileSize/1.25f);
         sprite.setFill(Color.web(playerPieceColor[val]));

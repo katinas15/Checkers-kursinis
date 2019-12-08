@@ -12,17 +12,13 @@ public class QueenPieceController implements PieceControllerStrategy {
     @Override
     public boolean checkHit(Piece selectedPiece, int toX, int toY){
         List<Piece> availableOppenents = findOpponents(selectedPiece);
-        if(availableOppenents.size() < 0){
-            return false;
-        }
+        if(availableOppenents.size() < 0) return false;
 
         Piece hit = availableOppenents.stream()
                 .filter(piece -> piece.getPosX() == toX && piece.getPosY() == toY)
                 .findFirst()
                 .orElse(null);
-        if(hit == null) {
-            return false;
-        }
+        if(hit == null) return false;
 
         if(SPM.checkInbetween(selectedPiece, hit.getPosX(), hit.getPosY())) return false;
 
@@ -30,9 +26,7 @@ public class QueenPieceController implements PieceControllerStrategy {
         int behindHitY = toY + SPM.toSingle(toY - selectedPiece.getPosY());
         if(!SPM.checkBounds(behindHitX,behindHitY)) return false;
 
-        if(SPM.checkTile(behindHitX, behindHitY) == null){
-            return true;
-        }
+        if(SPM.checkTile(behindHitX, behindHitY) == null) return true;
 
         return false;
     }
@@ -56,9 +50,7 @@ public class QueenPieceController implements PieceControllerStrategy {
     @Override
     public void checkSecondHit(Piece selectedPiece){
         List<Piece> search = findOpponents(selectedPiece);
-        if(search.size() < 0){
-            return ;
-        }
+        if(search.size() < 0) return;
 
         for(Piece p:search){
             if(checkHit(selectedPiece, p.getPosX(), p.getPosY())){
@@ -66,7 +58,6 @@ public class QueenPieceController implements PieceControllerStrategy {
                 return;
             }
         }
-
         changePlayer();
     }
 
@@ -80,7 +71,7 @@ public class QueenPieceController implements PieceControllerStrategy {
             int finalI = i;
             for (int t[]: diagonalArray) {
                 if ((selectedPiece.getPosX() + t[0] * finalI) == toX
-                        && (selectedPiece.getPosY() + t[1] * finalI) == toY) return true;
+                    && (selectedPiece.getPosY() + t[1] * finalI) == toY) return true;
             }
             i++;
         }

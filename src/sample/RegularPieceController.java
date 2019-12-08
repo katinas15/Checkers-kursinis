@@ -13,27 +13,20 @@ public class RegularPieceController implements PieceControllerStrategy {
     public boolean checkHit(Piece selectedPiece, int toX, int toY){
         if(!SPM.checkBounds(toX,toY)) return false;
         List<Piece> availableOppenents = findOpponents(selectedPiece);
-        if(availableOppenents.size() < 0){
-            return false;
-        }
+        if(availableOppenents.size() < 0) return false;
 
         Piece hit = availableOppenents.stream()
                 .filter(piece -> piece.getPosX() == toX && piece.getPosY() == toY)
                 .findFirst()
                 .orElse(null);
 
-        if(hit == null) {
-            return false;
-        }
+        if(hit == null) return false;
 
         int behindHitX = toX + (toX - selectedPiece.getPosX());
         int behindHitY = toY + (toY - selectedPiece.getPosY());
         if(!SPM.checkBounds(behindHitX,behindHitY)) return false;
 
-        if(SPM.checkTile(behindHitX, behindHitY) == null){
-            return true;
-        }
-
+        if(SPM.checkTile(behindHitX, behindHitY) == null) return true;
         return false;
     }
 
@@ -53,9 +46,7 @@ public class RegularPieceController implements PieceControllerStrategy {
     @Override
     public void checkSecondHit(Piece selectedPiece){
         List<Piece> search = findOpponents(selectedPiece);
-        if(search.size() < 0){
-            return;
-        }
+        if(search.size() < 0) return;
 
         for(Piece p:search){
             if(checkHit(selectedPiece, p.getPosX(), p.getPosY())){

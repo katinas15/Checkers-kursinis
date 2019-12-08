@@ -21,6 +21,13 @@ public class FxTextController {
 
     private GameBoard board;
 
+    public void update(){
+        setCurrentPlayerText();
+        setEndTurnButton();
+        setResetButton();
+        gameOver();
+    }
+
     public void setCurrentPlayerText(){
         if(currentPlayer){
             text.setText("Player White");
@@ -57,7 +64,7 @@ public class FxTextController {
 
     public void gameOver(){
         gameOverText.setX(tileSize*tableWidth);
-        gameOverText.setY(70);
+        gameOverText.setY(textOffsetY*7);
 
         List<Piece> pieces = allPieces.stream()
                 .filter(   piece -> piece.getColor() == true)
@@ -76,6 +83,8 @@ public class FxTextController {
             gameOverText.setText("Player White Wins!!!");
             return;
         }
+
+        gameOverText.setText("");
     }
 
     public void resetGameOver(){

@@ -24,13 +24,9 @@ abstract class Piece {
         return sprite;
     }
 
-    public int getPosX() {
-        return posX;
-    }
+    public int getPosX() { return posX; }
 
-    public int getPosY() {
-        return posY;
-    }
+    public int getPosY() { return posY; }
 
     public boolean getColor() {
         return color;
