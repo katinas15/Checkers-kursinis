@@ -25,6 +25,8 @@ public class FxMain extends Application {
     public static String selectedTileColor = "#3882c2";
     public static int tileSize = 50;
     public static int strokeSize = 3;
+    private int textOffsetX = 10;
+    private int textOffsetY = 20;
 
     private GridPane gridPane = new GridPane();
     public static Piece selectedPiece;
@@ -99,14 +101,14 @@ public class FxMain extends Application {
             text.setText("Player White");
         } else text.setText("Player Red");
 
-        text.setX(tileSize*tableWidth + 10);
-        text.setY(20);
+        text.setX(tileSize*tableWidth + textOffsetX);
+        text.setY(textOffsetY);
     }
 
     private void setEndTurnButton(){
         endTurnButton.setText("End Turn");
-        endTurnButton.setLayoutX(tileSize*tableWidth + 10);
-        endTurnButton.setLayoutY(40);
+        endTurnButton.setLayoutX(tileSize*tableWidth + textOffsetX);
+        endTurnButton.setLayoutY(textOffsetY*2);
 
         endTurnButton.setOnAction(actionEvent ->  {
             if(secondHit){
@@ -120,8 +122,8 @@ public class FxMain extends Application {
 
     private void setResetButton(){
         resetButton.setText("Reset All");
-        resetButton.setLayoutX(tileSize*tableWidth + 10);
-        resetButton.setLayoutY(80);
+        resetButton.setLayoutX(tileSize*tableWidth + textOffsetX);
+        resetButton.setLayoutY(textOffsetY*4);
 
         resetButton.setOnAction(actionEvent ->  {
             resetGame();
@@ -130,13 +132,13 @@ public class FxMain extends Application {
 
     private void gameOver(){
         gameOverText.setX(tileSize*tableWidth);
-        gameOverText.setY(140);
+        gameOverText.setY(textOffsetY*7);
 
         List<Piece> pieces = allPieces.stream()
                 .filter(   piece -> piece.getColor() == true)
                 .collect(Collectors.toList());
 
-        if(pieces.size() < 1){
+        if(pieces.size() <= 0){
             gameOverText.setText("Player Red Wins!!!");
             return;
         }
@@ -145,7 +147,7 @@ public class FxMain extends Application {
                 .filter(   piece -> piece.getColor() == false)
                 .collect(Collectors.toList());
 
-        if(pieces.size() < 1){
+        if(pieces.size() <= 0){
             gameOverText.setText("Player White Wins!!!");
             return;
         }
