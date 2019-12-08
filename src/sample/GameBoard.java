@@ -28,22 +28,7 @@ public class GameBoard {
 
     public void update(Piece selectedPiece, int toX, int toY){
         ControllerContext context = new ControllerContext(selectedPiece);
-
-        checkChangeToQueen(selectedPiece);
-    }
-
-    private void checkChangeToQueen(Piece selectedPiece){
-        if(selectedPiece.getColor()){
-            if(selectedPiece.getPosY() != 0) {
-                return;
-            }
-        } else if(selectedPiece.getPosY() != tableHeight-1){
-            return;
-        }
-
-        GetPieceFactory pieceFactory = new GetPieceFactory();
-        selectedPiece = pieceFactory.getPiece("QUEEN",selectedPiece.getPosX(),selectedPiece.getPosY(),selectedPiece.getColor());
-        if(selectedPiece.getColor() == currentPlayer) changePlayer();
+        context.update(selectedPiece,toX,toY);
     }
 
 }

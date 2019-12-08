@@ -14,5 +14,6 @@ public interface PieceControllerStrategy {
     public void processHit(Piece piece, int toX, int toY);
     public void checkSecondHit(Piece selectedPiece);
     public boolean checkStep(Piece selectedPiece, int toX, int toY);
+    public void processStep(Piece selectedPiece, int toX, int toY);
     public List<Piece> findOpponents(Piece selectedPiece);
 }

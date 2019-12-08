@@ -98,4 +98,26 @@ public class RegularPieceController implements PieceControllerStrategy {
 
         return foundOpponents;
     }
+
+    @Override
+    public void processStep(Piece selectedPiece, int toX, int toY){
+        selectedPiece.setPosition(toX, toY);
+        changePlayer();
+        checkChangeToQueen(selectedPiece);
+    }
+
+    private void checkChangeToQueen(Piece selectedPiece){
+        if(selectedPiece.getColor()){
+            if(selectedPiece.getPosY() != 0) {
+                return;
+            }
+        } else if(selectedPiece.getPosY() != tableHeight-1){
+            return;
+        }
+
+        allPieces.remove(selectedPiece);
+        GetPieceFactory pieceFactory = new GetPieceFactory();
+        allPieces.add(pieceFactory.getPiece("QUEEN",selectedPiece.getPosX(),selectedPiece.getPosY(),selectedPiece.getColor()));
+        if(selectedPiece.getColor() == currentPlayer) changePlayer();
+    }
 }

@@ -107,6 +107,12 @@ public class QueenPieceController implements PieceControllerStrategy {
         return diagonalOpponents;
     }
 
+    @Override
+    public void processStep(Piece selectedPiece, int toX, int toY){
+        selectedPiece.setPosition(toX, toY);
+        changePlayer();
+    }
+
     private boolean isInbounds(Piece selectedPiece, int i){
         if(selectedPiece.getPosX()-i >= 0) return true;
         if(selectedPiece.getPosX()+i < tableWidth) return true;
