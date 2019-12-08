@@ -41,7 +41,8 @@ public class FxMain extends Application {
     @Override
     public void start(Stage primaryStage){
         FxTextController textCTRL = new FxTextController();
-        GameBoard gameBoard = new GameBoard(board, textCTRL);
+        GameBoard gameBoard = new GameBoard(board);
+        gameBoard.setTextController(textCTRL);
         Group root = new Group(textCTRL.getFields(), gameBoard.getGridPane());
 
         primaryStage.setTitle("Checkers");

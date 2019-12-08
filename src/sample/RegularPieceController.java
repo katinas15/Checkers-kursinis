@@ -60,6 +60,7 @@ public class RegularPieceController implements PieceControllerStrategy {
         for(Piece p:search){
             if(checkHit(selectedPiece, p.getPosX(), p.getPosY())){
                 secondHit = true;
+                checkChangeToQueen(selectedPiece);
                 return;
             }
         }

@@ -26,14 +26,17 @@ public class GameBoard {
 
     int[][] board;
 
-    public GameBoard(int[][] board, FxTextController textCTRL) {
+    public GameBoard(int[][] board) {
         gridPane.setMinSize(tileSize*tableWidth, tileSize*tableHeight);
-        this.textCTRL = textCTRL;
-        textCTRL.setBoard(this);
         this.board = board;
         tableWidth = board[0].length;
         tableHeight = board.length;
         setPieces();
+    }
+
+    public void setTextController(FxTextController controller){
+        this.textCTRL = controller;
+        textCTRL.setBoard(this);
     }
 
     public void setBoard(int[][] board) {
@@ -75,10 +78,11 @@ public class GameBoard {
     }
 
     public void paintAll(){
-        textCTRL.setCurrentPlayerText();
-        textCTRL.setEndTurnButton();
-        textCTRL.setResetButton();
-
+        if(textCTRL != null){
+            textCTRL.setCurrentPlayerText();
+            textCTRL.setEndTurnButton();
+            textCTRL.setResetButton();
+        }
         gridPane.getChildren().clear();
         paintBoard();
 
@@ -101,7 +105,7 @@ public class GameBoard {
                         addGridEvent();
                     }
 
-                    textCTRL.gameOver();
+                    if(textCTRL != null) textCTRL.gameOver();
                 }
             });
         });
@@ -138,7 +142,7 @@ public class GameBoard {
         selectedPiece = null;
         currentPlayer = true;
         allPieces.removeAll(allPieces);
-        textCTRL.resetGameOver();
+        if(textCTRL != null) textCTRL.resetGameOver();
         setPieces();
         paintAll();
         addGridEvent();

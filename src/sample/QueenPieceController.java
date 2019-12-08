@@ -3,8 +3,8 @@ package sample;
 import java.util.ArrayList;
 import java.util.List;
 
-import static sample.FxMain.*;
 import static sample.GameBoard.allPieces;
+import static sample.GameBoard.secondHit;
 import static sample.GameBoard.changePlayer;
 
 public class QueenPieceController implements PieceControllerStrategy {
