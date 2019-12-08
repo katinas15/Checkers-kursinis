@@ -117,7 +117,7 @@ public class RegularPieceController implements PieceControllerStrategy {
 
         allPieces.remove(selectedPiece);
         GetPieceFactory pieceFactory = new GetPieceFactory();
-        allPieces.add(pieceFactory.getPiece("QUEEN",selectedPiece.getPosX(),selectedPiece.getPosY(),selectedPiece.getColor()));
+        allPieces.add(pieceFactory.getPiece(selectedPiece));
         if(selectedPiece.getColor() == currentPlayer) changePlayer();
     }
 }

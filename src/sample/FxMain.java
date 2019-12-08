@@ -80,12 +80,9 @@ public class FxMain extends Application {
         GetPieceFactory pieceFactory = new GetPieceFactory();
         for(int i = 0; i<tableHeight; i++) {
             for (int j = 0; j < tableWidth; j++) {
-                boolean color = gameBoard.getTile(j,i)%2 == 1;
-                if (gameBoard.getTile(j,i) == 1 || gameBoard.getTile(j,i) == 2) {
-                    Piece piece = pieceFactory.getPiece("REGULAR",j,i, color);
-                    allPieces.add(piece);
-                } else if (gameBoard.getTile(j,i) == 3 || gameBoard.getTile(j,i) == 4) {
-                    Piece piece = pieceFactory.getPiece("QUEEN",j,i,color);
+                int pieceType = gameBoard.getTile(j,i);
+                Piece piece = pieceFactory.getPiece(pieceType,j,i);
+                if(piece != null){
                     allPieces.add(piece);
                 }
             }
