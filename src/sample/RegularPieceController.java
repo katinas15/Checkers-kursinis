@@ -46,7 +46,7 @@ public class RegularPieceController implements PieceControllerStrategy {
     @Override
     public void checkSecondHit(Piece selectedPiece){
         List<Piece> search = findOpponents(selectedPiece);
-        if(search.size() < 0) return;
+        if(search.size() < 0)return;
 
         for(Piece p:search){
             if(checkHit(selectedPiece, p.getPosX(), p.getPosY())){
