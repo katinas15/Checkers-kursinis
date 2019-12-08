@@ -10,10 +10,10 @@ public interface PieceControllerStrategy {
             {-1,-1}
     };
 
-    public boolean checkHit(Piece piece, int toX, int toY);
-    public void processHit(Piece piece, int toX, int toY);
-    public void checkSecondHit(Piece selectedPiece);
-    public boolean checkStep(Piece selectedPiece, int toX, int toY);
-    public void processStep(Piece selectedPiece, int toX, int toY);
-    public List<Piece> findOpponents(Piece selectedPiece);
+    boolean checkHit(Piece piece, int toX, int toY);
+    void processHit(Piece piece, int toX, int toY);
+    void checkSecondHit(Piece selectedPiece);
+    boolean checkStep(Piece selectedPiece, int toX, int toY);
+    void processStep(Piece selectedPiece, int toX, int toY);
+    List<Piece> findOpponents(Piece selectedPiece);
 }

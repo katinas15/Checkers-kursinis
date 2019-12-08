@@ -203,7 +203,6 @@ public class FxMain extends Application {
             paintAll();
             addGridEvent();
         }
-
     }
 
     private void resetGame(){
