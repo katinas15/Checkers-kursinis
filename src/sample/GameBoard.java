@@ -27,17 +27,8 @@ public class GameBoard {
     }
 
     public void update(Piece selectedPiece, int toX, int toY){
-        if(!checkBounds(toX,toY)) return;
+        ControllerContext context = new ControllerContext(selectedPiece);
 
-        if(checkHit(selectedPiece, toX, toY)){
-            processHit(selectedPiece,toX,toY);
-            checkSecondHit(selectedPiece);
-
-        } else if(checkStep(selectedPiece, toX, toY)) {
-            selectedPiece.setPosition(toX, toY);
-            changePlayer();
-
-        }
         checkChangeToQueen(selectedPiece);
     }
 

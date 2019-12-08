@@ -8,8 +8,11 @@ import static sample.GameBoard.tableHeight;
 import static sample.GameBoard.tableWidth;
 
 public class RegularPieceController implements PieceControllerStrategy {
+    StandardChecks check = new StandardChecks();
+
     @Override
     public boolean checkHit(Piece selectedPiece, int toX, int toY){
+        if(!check.checkBounds(toX,toY)) return false;
         List<Piece> availableOppenents = findOpponents(selectedPiece);
         if(availableOppenents.size() < 0){
             return false;
@@ -26,9 +29,9 @@ public class RegularPieceController implements PieceControllerStrategy {
 
         int behindHitX = toX + (toX - selectedPiece.getPosX());
         int behindHitY = toY + (toY - selectedPiece.getPosY());
-        if(!checkBounds(behindHitX,behindHitY)) return false;
+        if(!check.checkBounds(behindHitX,behindHitY)) return false;
 
-        if(checkTile(behindHitX, behindHitY) == null){
+        if(check.checkTile(behindHitX, behindHitY) == null){
             return true;
         }
 
@@ -67,7 +70,8 @@ public class RegularPieceController implements PieceControllerStrategy {
 
     @Override
     public boolean checkStep(Piece selectedPiece, int toX, int toY){
-        if (checkTile(toX, toY) != null) return false;
+        if(!check.checkBounds(toX,toY)) return false;
+        if (check.checkTile(toX, toY) != null) return false;
 
         if(!selectedPiece.getColor()){
             if( (selectedPiece.getPosX() + 1) == toX && (selectedPiece.getPosY() + 1) == toY) return true;
@@ -93,27 +97,5 @@ public class RegularPieceController implements PieceControllerStrategy {
         }
 
         return foundOpponents;
-    }
-
-    private boolean checkBounds(int toX, int toY){
-        if(toX < 0) return false;
-        if(toX > tableWidth-1) return false;
-        if(toY < 0) return false;
-        if(toY > tableHeight-1) return false;
-
-        return true;
-    }
-
-    private Piece checkTile(int toX,int toY){
-        if(!checkBounds(toX,toY)) return null;
-
-        Piece tile = allPieces.stream()
-                .filter(piece -> piece.getPosX() == toX && piece.getPosY() == toY)
-                .findFirst()
-                .orElse(null);
-        if(tile == null) {
-            return null;
-        }
-        return tile;
     }
 }
