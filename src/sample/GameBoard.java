@@ -18,6 +18,9 @@ public class GameBoard {
     public static boolean secondHit = false;
     public static ArrayList<Piece> allPieces = new ArrayList();
 
+    private String[] tileColor = {"#a88132", "#32a881"};
+    private String selectedTileColor = "#3882c2";
+
     private GridPane gridPane = new GridPane();
     private FxTextController textCTRL;
     private int[][] board;

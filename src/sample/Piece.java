@@ -5,11 +5,11 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Shape;
 
-import static sample.FxMain.playerPieceColor;
 import static sample.FxMain.tileSize;
 
 abstract class Piece {
-
+    protected int strokeSize = 3;
+    protected String[] playerPieceColor = {"#ede6e4", "#fc3903"};
     protected boolean color;
     protected int posX, posY;
     protected Shape sprite;
