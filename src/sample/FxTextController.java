@@ -18,6 +18,9 @@ public class FxTextController {
 
     private int textOffsetX = 10;
     private int textOffsetY = 20;
+    private int endTurnButtonYOffset = textOffsetY*2;
+    private int resetButtonYOffset = textOffsetY*4;
+    private int gameOverYOffset = textOffsetY*7;
 
     private GameBoard board;
 
@@ -40,7 +43,7 @@ public class FxTextController {
     public void setEndTurnButton(){
         endTurnButton.setText("End Turn");
         endTurnButton.setLayoutX(tileSize*tableWidth + textOffsetX);
-        endTurnButton.setLayoutY(textOffsetY*2);
+        endTurnButton.setLayoutY(endTurnButtonYOffset);
 
         endTurnButton.setOnAction(actionEvent ->  {
             if(secondHit){
@@ -55,7 +58,7 @@ public class FxTextController {
     public void setResetButton(){
         resetButton.setText("Reset All");
         resetButton.setLayoutX(tileSize*tableWidth + textOffsetX);
-        resetButton.setLayoutY(textOffsetY*4);
+        resetButton.setLayoutY(resetButtonYOffset);
 
         resetButton.setOnAction(actionEvent ->  {
             board.resetGame();
@@ -64,7 +67,7 @@ public class FxTextController {
 
     public void gameOver(){
         gameOverText.setX(tileSize*tableWidth);
-        gameOverText.setY(textOffsetY*7);
+        gameOverText.setY(gameOverYOffset);
 
         List<Piece> pieces = allPieces.stream()
                 .filter(   piece -> piece.getColor() == true)
@@ -84,10 +87,6 @@ public class FxTextController {
             return;
         }
 
-        gameOverText.setText("");
-    }
-
-    public void resetGameOver(){
         gameOverText.setText("");
     }
 
