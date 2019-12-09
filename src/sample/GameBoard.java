@@ -129,6 +129,7 @@ public class GameBoard {
     }
 
     private void setPieces(){
+        allPieces.clear();
         GetPieceFactory pieceFactory = new GetPieceFactory();
         for(int i = 0; i<tableHeight; i++) {
             for (int j = 0; j < tableWidth; j++) {
